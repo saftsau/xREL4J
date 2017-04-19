@@ -111,28 +111,14 @@ abstract class NetworkingHelper {
 	}
 
 	/**
-	 * Connects to the xREL API using a GET request and retrieves the
-	 * {@link InputStream}. This can be the ErrorStream if there is a problem
-	 * while processing your request.
+	 * Extracts the HTTP response code and the RateLimit values from an xREL API
+	 * response and saves them.
 	 * 
-	 * @param url
-	 *            The URL
-	 * @param token
-	 *            The {@link Token} to be used for authentication or
-	 *            {@code null}
-	 * @return The retrieved {@link InputStream}
-	 * @throws MalformedURLException
+	 * @param httpsUrlConnection
+	 *            The connection to extract the response from
 	 * @throws IOException
 	 */
-	private static InputStream connectToXrelGet(String url, Token token) throws MalformedURLException, IOException {
-		HttpsURLConnection httpsUrlConnection = (HttpsURLConnection) new URL(url).openConnection();
-		httpsUrlConnection.setRequestMethod("GET");
-		if (token != null) {
-			httpsUrlConnection.addRequestProperty("Authorization", "Bearer " + token.getAccessToken());
-		}
-		httpsUrlConnection.setDoInput(true);
-		httpsUrlConnection.setDoOutput(true);
-
+	private static void handleResponseHeaders(HttpsURLConnection httpsUrlConnection) throws IOException {
 		// Handle the response code and header fields
 		setResponseCode(httpsUrlConnection.getResponseCode());
 
@@ -156,6 +142,32 @@ abstract class NetworkingHelper {
 		} else {
 			setXRateLimitReset(-1);
 		}
+	}
+
+	/**
+	 * Connects to the xREL API using a GET request and retrieves the
+	 * {@link InputStream}. This can be the ErrorStream if there is a problem
+	 * while processing your request.
+	 * 
+	 * @param url
+	 *            The URL
+	 * @param token
+	 *            The {@link Token} to be used for authentication or
+	 *            {@code null}
+	 * @return The retrieved {@link InputStream}
+	 * @throws MalformedURLException
+	 * @throws IOException
+	 */
+	private static InputStream connectToXrelGet(String url, Token token) throws MalformedURLException, IOException {
+		HttpsURLConnection httpsUrlConnection = (HttpsURLConnection) new URL(url).openConnection();
+		httpsUrlConnection.setRequestMethod("GET");
+		if (token != null) {
+			httpsUrlConnection.addRequestProperty("Authorization", "Bearer " + token.getAccessToken());
+		}
+		httpsUrlConnection.setDoInput(true);
+		httpsUrlConnection.setDoOutput(true);
+
+		handleResponseHeaders(httpsUrlConnection);
 
 		// Choose InputStream or ErrorStream depending on the response code
 		InputStream inputStream;
@@ -198,8 +210,7 @@ abstract class NetworkingHelper {
 		writer.write(params);
 		writer.close();
 
-		// Handle the response code
-		setResponseCode(httpsUrlConnection.getResponseCode());
+		handleResponseHeaders(httpsUrlConnection);
 
 		// Choose InputStream or ErrorStream depending on the response code
 		InputStream inputStream;

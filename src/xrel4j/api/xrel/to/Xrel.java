@@ -763,7 +763,8 @@ public class Xrel {
 			throw new XrelException("parameters missing");
 		}
 
-		JSONArray jsonArray = NetworkingHelper.readJsonArrayFromUrlGet(xrelUrl + "calendar/upcoming" + format, null);
+		String url = xrelUrl + "calendar/upcoming" + format + "?country=" + country;
+		JSONArray jsonArray = NetworkingHelper.readJsonArrayFromUrlGet(url, null);
 		ArrayList<ExtInfo> upcomingList = new ArrayList<ExtInfo>();
 		for (int i = 0; i < jsonArray.length(); i++) {
 			ExtInfo extInfo = new ExtInfo(jsonArray.getJSONObject(i));

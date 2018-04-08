@@ -346,10 +346,10 @@ public abstract class NetworkingHelper {
     // We need to save the input we get first because we have to process it
     // twice
     ByteArrayOutputStream out = new ByteArrayOutputStream();
-    int byte_ = inputStream.read();
-    while (byte_ != -1) {
-      out.write(byte_);
-      byte_ = inputStream.read();
+    int currentByte = inputStream.read();
+    while (currentByte != -1) {
+      out.write(currentByte);
+      currentByte = inputStream.read();
     }
     byte[] byteResponse = out.toByteArray();
     inputStream.close();

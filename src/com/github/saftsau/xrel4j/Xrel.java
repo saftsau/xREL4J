@@ -151,6 +151,52 @@ public class Xrel {
     this.scope = Optional.of(scope);
   }
 
+
+  /**
+   * Gets the xREL base URL.
+   * 
+   * @return The xREL URL
+   */
+  private String getXrelUrl() {
+    return xrelUrl;
+  }
+
+  /**
+   * Gets the format of the wanted response.
+   * 
+   * @return The format of the response
+   */
+  private String getFormat() {
+    return format;
+  }
+
+  /**
+   * Gets the minimum amount of entries in pagination.
+   * 
+   * @return The minimum pagination amount
+   */
+  private int getPaginationPerPageMin() {
+    return paginationPerPageMin;
+  }
+
+  /**
+   * Gets the maximum amount of entries in pagination.
+   * 
+   * @return The maximum pagination amount
+   */
+  private int getPaginationPerPageMax() {
+    return paginationPerPageMax;
+  }
+
+  /**
+   * Gets the response type used for OAuth.
+   * 
+   * @return The response type
+   */
+  private String getResponseType() {
+    return responseType;
+  }
+
   /**
    * Gets the set consumer key.
    * 
@@ -206,10 +252,10 @@ public class Xrel {
    * @return An array with perPage on [0] and page on [1]
    */
   private int[] normalizePageValues(int perPage, int page) {
-    if (perPage < paginationPerPageMin) {
-      perPage = paginationPerPageMin;
-    } else if (perPage > paginationPerPageMax) {
-      perPage = paginationPerPageMax;
+    if (perPage < getPaginationPerPageMin()) {
+      perPage = getPaginationPerPageMin();
+    } else if (perPage > getPaginationPerPageMax()) {
+      perPage = getPaginationPerPageMax();
     }
     if (page < 1) {
       page = 1;
@@ -284,14 +330,13 @@ public class Xrel {
    */
   private Release getReleaseInfo(String idDir, boolean useId) throws IOException, XrelException {
     Objects.requireNonNull(idDir, "idDir missing");
-
     String json;
     if (useId) {
-      json =
-          NetworkingHelper.readStringFromUrlGet(xrelUrl + "release/info" + format + "?id=" + idDir);
+      json = NetworkingHelper
+          .readStringFromUrlGet(getXrelUrl() + "release/info" + getFormat() + "?id=" + idDir);
     } else {
       json = NetworkingHelper
-          .readStringFromUrlGet(xrelUrl + "release/info" + format + "?dirname=" + idDir);
+          .readStringFromUrlGet(getXrelUrl() + "release/info" + getFormat() + "?dirname=" + idDir);
     }
 
     Release release = JsonbSingleton.getInstance().getJsonb().fromJson(json, Release.class);
@@ -349,8 +394,8 @@ public class Xrel {
       Filter filter, Token token) throws IOException, XrelException {
     int[] normalizedPageValues = normalizePageValues(perPage, page);
 
-    String url = xrelUrl + "release/latest" + format + "?per_page=" + normalizedPageValues[0]
-        + "&page=" + normalizedPageValues[1];
+    String url = getXrelUrl() + "release/latest" + getFormat() + "?per_page="
+        + normalizedPageValues[0] + "&page=" + normalizedPageValues[1];
     if (archive != null) {
       url += "&archive=" + archive;
     }
@@ -534,7 +579,8 @@ public class Xrel {
    *      release/categories method</a>
    */
   public Set<ReleaseCategory> getReleaseCategories() throws IOException, XrelException {
-    String json = NetworkingHelper.readStringFromUrlGet(xrelUrl + "release/categories" + format);
+    String json =
+        NetworkingHelper.readStringFromUrlGet(getXrelUrl() + "release/categories" + getFormat());
     Set<ReleaseCategory> categorySet =
         JsonbSingleton.getInstance().getJsonb().fromJson(json, new HashSet<ReleaseCategory>() {
           private static final long serialVersionUID = 1L;
@@ -570,8 +616,8 @@ public class Xrel {
       String extInfoType, int perPage, int page) throws IOException, XrelException {
     int[] normalizedPageValues = normalizePageValues(perPage, page);
 
-    String url =
-        xrelUrl + "release/browse_category" + format + "?category_name=" + category.getName();
+    String url = getXrelUrl() + "release/browse_category" + getFormat() + "?category_name="
+        + category.getName();
     if (extInfoType != null) {
       url += "&ext_info_type=" + extInfoType;
     }
@@ -638,8 +684,8 @@ public class Xrel {
 
     int[] normalizedPageValues = normalizePageValues(perPage, page);
 
-    String url = xrelUrl + "release/ext_info" + format + "?id=" + extInfo.getId() + "&per_page="
-        + normalizedPageValues[0] + "&page=" + normalizedPageValues[1];
+    String url = getXrelUrl() + "release/ext_info" + getFormat() + "?id=" + extInfo.getId()
+        + "&per_page=" + normalizedPageValues[0] + "&page=" + normalizedPageValues[1];
     String json = NetworkingHelper.readStringFromUrlGet(url);
     PaginationList<Release> releaseList = JsonbSingleton.getInstance().getJsonb().fromJson(json,
         new PaginationList<Release>() {}.getClass().getGenericSuperclass());
@@ -658,7 +704,8 @@ public class Xrel {
    *      method</a>
    */
   public Set<Filter> getReleaseFilters() throws IOException, XrelException {
-    String json = NetworkingHelper.readStringFromUrlGet(xrelUrl + "release/filters" + format);
+    String json =
+        NetworkingHelper.readStringFromUrlGet(getXrelUrl() + "release/filters" + getFormat());
     Set<Filter> filterSet =
         JsonbSingleton.getInstance().getJsonb().fromJson(json, new HashSet<Filter>() {
           private static final long serialVersionUID = 1L;
@@ -703,7 +750,7 @@ public class Xrel {
     keyList.add("image");
     valueList.add(image);
 
-    String url = xrelUrl + "release/addproof" + format;
+    String url = getXrelUrl() + "release/addproof" + getFormat();
     String json = NetworkingHelper.readStringFromUrlPost(url, token, keyList, valueList);
 
     // We only care about the proof url because the releases we get are known
@@ -734,8 +781,8 @@ public class Xrel {
       throws IOException, XrelException {
     int[] normalizedPageValues = normalizePageValues(perPage, page);
 
-    String url = xrelUrl + "p2p/releases" + format + "?per_page=" + normalizedPageValues[0]
-        + "&page=" + normalizedPageValues[1];
+    String url = getXrelUrl() + "p2p/releases" + getFormat() + "?per_page="
+        + normalizedPageValues[0] + "&page=" + normalizedPageValues[1];
     if (p2pCategory != null) {
       url += "&category_id=" + p2pCategory.getId();
     }
@@ -907,7 +954,8 @@ public class Xrel {
    * @see <a href= "https://www.xrel.to/wiki/3698/api-p2p-categories.html">API: p2p/categories</a>
    */
   public Set<P2pCategory> getP2pCategories() throws IOException, XrelException {
-    String json = NetworkingHelper.readStringFromUrlGet(xrelUrl + "p2p/categories" + format);
+    String json =
+        NetworkingHelper.readStringFromUrlGet(getXrelUrl() + "p2p/categories" + getFormat());
     Set<P2pCategory> p2pSet =
         JsonbSingleton.getInstance().getJsonb().fromJson(json, new HashSet<P2pCategory>() {
           private static final long serialVersionUID = 1L;
@@ -932,11 +980,11 @@ public class Xrel {
 
     String json;
     if (useId) {
-      json =
-          NetworkingHelper.readStringFromUrlGet(xrelUrl + "p2p/rls_info" + format + "?id=" + idDir);
+      json = NetworkingHelper
+          .readStringFromUrlGet(getXrelUrl() + "p2p/rls_info" + getFormat() + "?id=" + idDir);
     } else {
       json = NetworkingHelper
-          .readStringFromUrlGet(xrelUrl + "p2p/rls_info" + format + "?dirname=" + idDir);
+          .readStringFromUrlGet(getXrelUrl() + "p2p/rls_info" + getFormat() + "?dirname=" + idDir);
     }
     P2pRelease p2pRelease =
         JsonbSingleton.getInstance().getJsonb().fromJson(json, P2pRelease.class);
@@ -991,8 +1039,8 @@ public class Xrel {
       throw new XrelException("viewnfo scope not provided");
     }
 
-    return NetworkingHelper
-        .readByteFromUrlGet(xrelUrl + "nfo/release" + format + "?id=" + release.getId(), token);
+    return NetworkingHelper.readByteFromUrlGet(
+        getXrelUrl() + "nfo/release" + getFormat() + "?id=" + release.getId(), token);
   }
 
   /**
@@ -1013,8 +1061,8 @@ public class Xrel {
       throw new XrelException("viewnfo scope not provided");
     }
 
-    return NetworkingHelper
-        .readByteFromUrlGet(xrelUrl + "nfo/p2p_rls" + format + "?id=" + p2pRelease.getId(), token);
+    return NetworkingHelper.readByteFromUrlGet(
+        getXrelUrl() + "nfo/p2p_rls" + getFormat() + "?id=" + p2pRelease.getId(), token);
   }
 
   /**
@@ -1035,7 +1083,7 @@ public class Xrel {
       throw new XrelException("country must be either de or en");
     }
 
-    String url = xrelUrl + "calendar/upcoming" + format + "?country=" + country;
+    String url = getXrelUrl() + "calendar/upcoming" + getFormat() + "?country=" + country;
     String json = NetworkingHelper.readStringFromUrlGet(url);
     List<ExtInfo> upcomingList =
         JsonbSingleton.getInstance().getJsonb().fromJson(json, new ArrayList<ExtInfo>() {
@@ -1062,11 +1110,11 @@ public class Xrel {
 
     String json;
     if (token == null) {
-      json = NetworkingHelper
-          .readStringFromUrlGet(xrelUrl + "ext_info/info" + format + "?id=" + extInfo.getId());
+      json = NetworkingHelper.readStringFromUrlGet(
+          getXrelUrl() + "ext_info/info" + getFormat() + "?id=" + extInfo.getId());
     } else {
       json = NetworkingHelper.readStringFromUrlGet(
-          xrelUrl + "ext_info/info" + format + "?id=" + extInfo.getId(), token);
+          getXrelUrl() + "ext_info/info" + getFormat() + "?id=" + extInfo.getId(), token);
     }
     ExtInfo extInfoNew = JsonbSingleton.getInstance().getJsonb().fromJson(json, ExtInfo.class);
     return extInfoNew;
@@ -1120,8 +1168,8 @@ public class Xrel {
   public void getExtInfoMedia(ExtInfo extInfo) throws IOException, XrelException {
     Objects.requireNonNull(extInfo, "extInfo missing");
 
-    String json = NetworkingHelper
-        .readStringFromUrlGet(xrelUrl + "ext_info/media" + format + "?id=" + extInfo.getId());
+    String json = NetworkingHelper.readStringFromUrlGet(
+        getXrelUrl() + "ext_info/media" + getFormat() + "?id=" + extInfo.getId());
     List<ExtInfoMedia> extInfoMediaList =
         JsonbSingleton.getInstance().getJsonb().fromJson(json, new ArrayList<ExtInfoMedia>() {
           private static final long serialVersionUID = 1L;
@@ -1163,8 +1211,8 @@ public class Xrel {
       throw new XrelException("rating must be in the range of 1 - 10");
     }
 
-    String json = NetworkingHelper.readStringFromUrlPost(xrelUrl + "ext_info/rate" + format, token,
-        keyList, valueList);
+    String json = NetworkingHelper.readStringFromUrlPost(
+        getXrelUrl() + "ext_info/rate" + getFormat(), token, keyList, valueList);
     ExtInfo extInfoRated = JsonbSingleton.getInstance().getJsonb().fromJson(json, ExtInfo.class);
     extInfo.setOwnRating(extInfoRated.getOwnRating());
   }
@@ -1193,7 +1241,7 @@ public class Xrel {
     }
 
     q = URLEncoder.encode(q, StandardCharsets.UTF_8.name());
-    String url = xrelUrl + "search/releases" + format + "?q=" + q;
+    String url = getXrelUrl() + "search/releases" + getFormat() + "?q=" + q;
     if (scene) {
       url += "&scene=true";
     } else {
@@ -1239,7 +1287,7 @@ public class Xrel {
     }
 
     q = URLEncoder.encode(q, StandardCharsets.UTF_8.name());
-    String url = xrelUrl + "search/ext_info" + format + "?q=" + q;
+    String url = getXrelUrl() + "search/ext_info" + getFormat() + "?q=" + q;
     if (type != null && !type.isEmpty()) {
       url += "&type=" + type;
     }
@@ -1312,7 +1360,8 @@ public class Xrel {
   public List<Favorite> getFavsLists(Token token) throws IOException, XrelException {
     Objects.requireNonNull(token, "token missing");
 
-    String json = NetworkingHelper.readStringFromUrlGet(xrelUrl + "favs/lists" + format, token);
+    String json =
+        NetworkingHelper.readStringFromUrlGet(getXrelUrl() + "favs/lists" + getFormat(), token);
     List<Favorite> favoriteList =
         JsonbSingleton.getInstance().getJsonb().fromJson(json, new ArrayList<Favorite>() {
           private static final long serialVersionUID = 1L;
@@ -1339,8 +1388,8 @@ public class Xrel {
     Objects.requireNonNull(favorite, "favorite missing");
     Objects.requireNonNull(token, "token missing");
 
-    String url =
-        xrelUrl + "favs/list_entries" + format + "?id=" + favorite.getId() + "&get_releases=";
+    String url = getXrelUrl() + "favs/list_entries" + getFormat() + "?id=" + favorite.getId()
+        + "&get_releases=";
     if (getReleases) {
       url += "true";
     } else {
@@ -1389,11 +1438,11 @@ public class Xrel {
     keyList.add("ext_info_id");
     valueList.add(String.valueOf(extInfo.getId()));
 
-    String url = xrelUrl;
+    String url = getXrelUrl();
     if (delete) {
-      url += "favs/list_delentry" + format;
+      url += "favs/list_delentry" + getFormat();
     } else {
-      url += "favs/list_addentry" + format;
+      url += "favs/list_addentry" + getFormat();
     }
 
     String json = NetworkingHelper.readStringFromUrlPost(url, token, keyList, valueList);
@@ -1479,8 +1528,8 @@ public class Xrel {
     keyList.add("type");
     valueList.add(type);
 
-    String json = NetworkingHelper.readStringFromUrlPost(xrelUrl + "favs/list_markread" + format,
-        token, keyList, valueList);
+    String json = NetworkingHelper.readStringFromUrlPost(
+        getXrelUrl() + "favs/list_markread" + getFormat(), token, keyList, valueList);
     Favorite favoriteNew = JsonbSingleton.getInstance().getJsonb().fromJson(json, Favorite.class);
     return favoriteNew;
   }
@@ -1546,12 +1595,12 @@ public class Xrel {
 
     String json;
     if (release != null) {
-      json = NetworkingHelper.readStringFromUrlGet(
-          xrelUrl + "comments/get" + format + "?id=" + release.getId() + "&type=release&per_page="
-              + normalizedPageValues[0] + "&page=" + normalizedPageValues[1]);
+      json = NetworkingHelper.readStringFromUrlGet(getXrelUrl() + "comments/get" + getFormat()
+          + "?id=" + release.getId() + "&type=release&per_page=" + normalizedPageValues[0]
+          + "&page=" + normalizedPageValues[1]);
     } else {
-      json = NetworkingHelper.readStringFromUrlGet(xrelUrl + "comments/get" + format + "?id="
-          + p2pRelease.getId() + "&type=p2p_rls&per_page=" + perPage + "&page=" + page);
+      json = NetworkingHelper.readStringFromUrlGet(getXrelUrl() + "comments/get" + getFormat()
+          + "?id=" + p2pRelease.getId() + "&type=p2p_rls&per_page=" + perPage + "&page=" + page);
     }
 
     PaginationList<Comment> commentList = JsonbSingleton.getInstance().getJsonb().fromJson(json,
@@ -1655,8 +1704,8 @@ public class Xrel {
       throw new XrelException("either a text or a rating is mandatory");
     }
 
-    String json = NetworkingHelper.readStringFromUrlPost(xrelUrl + "comments/add" + format, token,
-        keyList, valueList);
+    String json = NetworkingHelper.readStringFromUrlPost(
+        getXrelUrl() + "comments/add" + getFormat(), token, keyList, valueList);
     Comment comment = JsonbSingleton.getInstance().getJsonb().fromJson(json, Comment.class);
 
     return comment;
@@ -1730,7 +1779,8 @@ public class Xrel {
   public User getUserInfo(Token token) throws IOException, XrelException {
     Objects.requireNonNull(token, "token missing");
 
-    String json = NetworkingHelper.readStringFromUrlGet(xrelUrl + "user/info" + format, token);
+    String json =
+        NetworkingHelper.readStringFromUrlGet(getXrelUrl() + "user/info" + getFormat(), token);
     User user = JsonbSingleton.getInstance().getJsonb().fromJson(json, User.class);
 
     return user;
@@ -1745,8 +1795,8 @@ public class Xrel {
    * @see <a href="https://www.xrel.to/wiki/6436/api-oauth2.html">API: OAuth 2.0</a>
    */
   public String getOauth2Auth() {
-    String url =
-        xrelUrl + "oauth2/auth?response_type=" + responseType + "&client_id=" + getClientId().get();
+    String url = getXrelUrl() + "oauth2/auth?response_type=" + getResponseType() + "&client_id="
+        + getClientId().get();
     if (getRedirectUri().isPresent()) {
       url += "&redirect_uri=" + getRedirectUri().get();
     }
@@ -1850,7 +1900,7 @@ public class Xrel {
     }
 
     String tokenJsonString = NetworkingHelper
-        .readStringFromUrlPost(xrelUrl + "oauth2/token" + format, keyList, valueList);
+        .readStringFromUrlPost(getXrelUrl() + "oauth2/token" + getFormat(), keyList, valueList);
     Token newToken = JsonbSingleton.getInstance().getJsonb().fromJson(tokenJsonString, Token.class);
     return newToken;
   }

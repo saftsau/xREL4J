@@ -41,7 +41,7 @@ public class XrelException extends Exception {
    */
   public static XrelException createXrelException(Optional<String> json, int responseCode) {
     String message;
-    if (json.isPresent()) {
+    if (!json.isPresent()) {
       message = "response_code: ";
       message += responseCode;
       return new XrelException(message, responseCode);

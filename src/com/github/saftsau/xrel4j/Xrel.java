@@ -1834,7 +1834,7 @@ public class Xrel {
       keyList.add("redirect_uri");
       valueList.add(getRedirectUri().get());
     }
-    if (getScope() != null && getScope().get().length > 0) {
+    if (getScope().isPresent() && getScope().get().length > 0) {
       keyList.add("scope");
       String scopeValues = "";
       boolean first = true;

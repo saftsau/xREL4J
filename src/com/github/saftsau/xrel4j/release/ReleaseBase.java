@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 saftsau
+ * Copyright 2017, 2018 saftsau
  *
  * This file is part of xREL4J.
  *
@@ -20,6 +20,7 @@ package com.github.saftsau.xrel4j.release;
 import com.github.saftsau.xrel4j.extinfo.ExtInfo;
 import com.github.saftsau.xrel4j.release.p2p.P2pRelease;
 import com.github.saftsau.xrel4j.release.scene.Release;
+import javax.json.bind.annotation.JsonbProperty;
 
 /**
  * Class represents a base release which contains information shared by {@link Release} and
@@ -29,12 +30,19 @@ public abstract class ReleaseBase {
 
   private String id;
   private String dirname;
+  @JsonbProperty("link_href")
   private String linkHref;
+  @JsonbProperty("num_ratings")
   private int numRatings;
+  @JsonbProperty("video_rating")
   private double videoRating;
+  @JsonbProperty("audio_rating")
   private double audioRating;
+  @JsonbProperty("ext_info")
   private ExtInfo extInfo;
+  @JsonbProperty("tv_season")
   private int tvSeason;
+  @JsonbProperty("tv_episode")
   private int tvEpisode;
   private int comments;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 saftsau
+ * Copyright 2017, 2018 saftsau
  *
  * This file is part of xREL4J.
  *
@@ -17,6 +17,8 @@
 
 package com.github.saftsau.xrel4j.extinfo;
 
+import javax.json.bind.annotation.JsonbProperty;
+
 /**
  * Class represents external info an {@link ExtInfo} can contain. Used for adding plots from other
  * websites.
@@ -24,6 +26,7 @@ package com.github.saftsau.xrel4j.extinfo;
 public class External {
 
   private External external;
+  @JsonbProperty("link_url")
   private String linkUrl;
   private String plot;
 

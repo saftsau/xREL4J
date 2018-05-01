@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 saftsau
+ * Copyright 2017, 2018 saftsau
  *
  * This file is part of xREL4J.
  *
@@ -17,13 +17,18 @@
 
 package com.github.saftsau.xrel4j;
 
+import javax.json.bind.annotation.JsonbProperty;
+
 /**
  * Class used for any other classes that use pagination in their results.
  */
 public class Pagination {
 
+  @JsonbProperty("current_page")
   private int currentPage;
+  @JsonbProperty("per_page")
   private int perPage;
+  @JsonbProperty("total_pages")
   private long totalPages;
 
   /**

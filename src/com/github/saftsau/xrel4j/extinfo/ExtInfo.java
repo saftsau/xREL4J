@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 saftsau
+ * Copyright 2017, 2018 saftsau
  *
  * This file is part of xREL4J.
  *
@@ -20,6 +20,7 @@ package com.github.saftsau.xrel4j.extinfo;
 import com.github.saftsau.xrel4j.release.p2p.P2pRelease;
 import com.github.saftsau.xrel4j.release.scene.Release;
 import java.util.List;
+import javax.json.bind.annotation.JsonbProperty;
 
 /**
  * Class represents an ExtInfo, used for all information xREL has about any product (movie, game,
@@ -30,19 +31,27 @@ public class ExtInfo {
   private String type;
   private String id;
   private String title;
+  @JsonbProperty("link_href")
   private String linkHref;
   private String genre;
+  @JsonbProperty("alt_title")
   private String altTitle;
+  @JsonbProperty("cover_url")
   private String coverUrl;
   private List<String> uris;
   private double rating;
+  @JsonbProperty("own_rating")
   private int ownRating;
+  @JsonbProperty("num_ratings")
   private long numRatings;
+  @JsonbProperty("release_dates")
   private List<ReleaseDate> releaseDates;
   private List<External> externals;
+  @JsonbProperty("ext_info_media")
   private List<ExtInfoMedia> extInfoMedia;
-  private List<Release> unreadReleases;
-  private List<P2pRelease> unreadP2pReleases;
+  private List<Release> releases;
+  @JsonbProperty("p2p_releases")
+  private List<P2pRelease> p2pReleases;
 
   /**
    * Gets the type of this ExtInfo. Possible values are {@code movie}, {@code console},
@@ -178,8 +187,8 @@ public class ExtInfo {
    * 
    * @return The list of unread releases
    */
-  public List<Release> getUnreadReleases() {
-    return unreadReleases;
+  public List<Release> getReleases() {
+    return releases;
   }
 
   /**
@@ -188,8 +197,8 @@ public class ExtInfo {
    * 
    * @param unreadReleases The list of unread releases to set
    */
-  public void setUnreadReleases(List<Release> unreadReleases) {
-    this.unreadReleases = unreadReleases;
+  public void setReleases(List<Release> unreadReleases) {
+    this.releases = unreadReleases;
   }
 
   /**
@@ -198,8 +207,8 @@ public class ExtInfo {
    * 
    * @return The list of unread P2P releases
    */
-  public List<P2pRelease> getUnreadP2pReleases() {
-    return unreadP2pReleases;
+  public List<P2pRelease> getP2pReleases() {
+    return p2pReleases;
   }
 
   /**
@@ -208,8 +217,8 @@ public class ExtInfo {
    * 
    * @param unreadP2pReleases The list of unread P2P releases to set
    */
-  public void setUnreadP2pReleases(List<P2pRelease> unreadP2pReleases) {
-    this.unreadP2pReleases = unreadP2pReleases;
+  public void setP2pReleases(List<P2pRelease> unreadP2pReleases) {
+    this.p2pReleases = unreadP2pReleases;
   }
 
   /**
@@ -348,12 +357,11 @@ public class ExtInfo {
   public String toString() {
     return "ExtInfo [getType()=" + getType() + ", getId()=" + getId() + ", getTitle()=" + getTitle()
         + ", getLinkHref()=" + getLinkHref() + ", getRating()=" + getRating() + ", getNumRatings()="
-        + getNumRatings() + ", getUris()=" + getUris() + ", getUnreadReleases()="
-        + getUnreadReleases() + ", getUnreadP2pReleases()=" + getUnreadP2pReleases()
-        + ", getExtInfoMedia()=" + getExtInfoMedia() + ", getGenre()=" + getGenre()
-        + ", getAltTitle()=" + getAltTitle() + ", getCoverUrl()=" + getCoverUrl()
-        + ", getReleaseDates()=" + getReleaseDates() + ", getExternals()=" + getExternals()
-        + ", getOwnRating()=" + getOwnRating() + "]";
+        + getNumRatings() + ", getUris()=" + getUris() + ", getUnreadReleases()=" + getReleases()
+        + ", getUnreadP2pReleases()=" + getP2pReleases() + ", getExtInfoMedia()="
+        + getExtInfoMedia() + ", getGenre()=" + getGenre() + ", getAltTitle()=" + getAltTitle()
+        + ", getCoverUrl()=" + getCoverUrl() + ", getReleaseDates()=" + getReleaseDates()
+        + ", getExternals()=" + getExternals() + ", getOwnRating()=" + getOwnRating() + "]";
   }
 
 }

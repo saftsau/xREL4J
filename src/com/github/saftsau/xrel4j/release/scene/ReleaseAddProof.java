@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, 2018 saftsau
+ * Copyright 2018 saftsau
  *
  * This file is part of xREL4J.
  *
@@ -17,58 +17,61 @@
 
 package com.github.saftsau.xrel4j.release.scene;
 
+import com.github.saftsau.xrel4j.Xrel;
 import java.util.List;
 import javax.json.bind.annotation.JsonbProperty;
 
 /**
- * Class represents a proof. This is retrieved partially by the xREL API after the user posted one.
+ * Class represents an
+ * {@link Xrel#postReleaseAddProof(List, String, com.github.saftsau.xrel4j.Token)} result as
+ * provided by the xREL API.
  */
-public class Proof {
+public class ReleaseAddProof {
 
   @JsonbProperty("proof_url")
   private String proofUrl;
-  @JsonbProperty("release_list")
-  private List<Release> releaseList;
+  private List<Release> releases;
 
   /**
-   * Gets the link of this proof.
+   * Gets the URL of the proof image.
    * 
-   * @return The link
+   * @return The proof URL
    */
   public String getProofUrl() {
     return proofUrl;
   }
 
   /**
-   * Sets the link of this proof.
+   * Sets the URL of the proof image.
    * 
-   * @param proofUrl The link to set
+   * @param proofUrl The proof URL to set
    */
   public void setProofUrl(String proofUrl) {
     this.proofUrl = proofUrl;
   }
 
   /**
-   * Gets the list of {@link Release} this Proof belongs to. Can be empty.
+   * Gets the {@link List} of {@link Release} this proof belongs to.
    * 
-   * @return The list of {@link Release}
+   * @return The releases
    */
-  public List<Release> getReleaseList() {
-    return releaseList;
+  public List<Release> getReleases() {
+    return releases;
   }
 
   /**
-   * Sets the list of {@link Release} this Proof belongs to. Can be empty.
+   * Sets the {@link List} of {@link Release} this proof belongs to.
    * 
-   * @param releaseList The list of {@link Release} to set
+   * @param releases The releases to set
    */
-  public void setReleaseList(List<Release> releaseList) {
-    this.releaseList = releaseList;
+  public void setReleases(List<Release> releases) {
+    this.releases = releases;
   }
 
   @Override
   public String toString() {
-    return "Proof [getProofUrl()=" + getProofUrl() + ", getReleaseList()=" + getReleaseList() + "]";
+    return "ReleaseAddProof [getProofUrl()=" + getProofUrl() + ", getReleases()=" + getReleases()
+        + "]";
   }
 
 }

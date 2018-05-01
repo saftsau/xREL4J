@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 saftsau
+ * Copyright 2017, 2018 saftsau
  *
  * This file is part of xREL4J.
  *
@@ -17,7 +17,6 @@
 
 package com.github.saftsau.xrel4j;
 
-import com.github.saftsau.xrel4j.util.JsonbSingleton;
 import java.util.Optional;
 
 /**
@@ -33,33 +32,6 @@ public class XrelException extends Exception {
   private int responseCode;
 
   /**
-   * Creates an XrelException based on a JSON String as returned by the xREL API.
-   * 
-   * @param json The JSON String to create an XrelException from
-   * @param responseCode The response code given from the xREL API
-   * @return The created XrelException
-   */
-  public static XrelException createXrelException(Optional<String> json, int responseCode) {
-    String message;
-    if (!json.isPresent()) {
-      message = "response_code: ";
-      message += responseCode;
-      return new XrelException(message, responseCode);
-    } else {
-      Error error = JsonbSingleton.getInstance().getJsonb().fromJson(json.get(), Error.class);
-      message = "error: ";
-      message += error.getError();
-      message += " - error_type: ";
-      message += error.getErrorType();
-      message += " - error_description: ";
-      message += error.getErrorDescription();
-      message += " - response_code: ";
-      message += responseCode;
-      return new XrelException(message, error, responseCode);
-    }
-  }
-
-  /**
    * Constructs an XrelException with solely an error message.
    * 
    * @param message The error message
@@ -71,14 +43,25 @@ public class XrelException extends Exception {
   }
 
   /**
-   * Constructs an XrelException with the response code from the xREL API but no JSON String. Can be
-   * used if no network connection is available.
+   * Constructs an XrelException with solely a response code.
    * 
-   * @param message The error message
    * @param responseCode The HTTP response code
    */
-  public XrelException(String message, int responseCode) {
-    super(message);
+  public XrelException(int responseCode) {
+    super();
+    this.error = Optional.empty();
+    this.responseCode = responseCode;
+  }
+
+  /**
+   * Constructs an XrelException with the response code from the xREL API but no content. This is
+   * generally used, when we can't unmarshal the object that was returned.
+   * 
+   * @param throwable The parent {@link Throwable}
+   * @param responseCode The HTTP response code
+   */
+  public XrelException(Throwable throwable, int responseCode) {
+    super(throwable);
     this.error = Optional.empty();
     this.responseCode = responseCode;
   }

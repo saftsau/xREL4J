@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 saftsau
+ * Copyright 2017, 2018 saftsau
  *
  * This file is part of xREL4J.
  *
@@ -18,6 +18,7 @@
 package com.github.saftsau.xrel4j.release.p2p;
 
 import com.github.saftsau.xrel4j.release.ReleaseBase;
+import javax.json.bind.annotation.JsonbProperty;
 
 /**
  * Class represents a P2P release with all its information provided by the xREL API.
@@ -25,9 +26,13 @@ import com.github.saftsau.xrel4j.release.ReleaseBase;
 public class P2pRelease extends ReleaseBase {
 
   private P2pCategory category;
+  @JsonbProperty("main_lang")
   private String mainLang;
+  @JsonbProperty("pub_time")
   private long pubTime;
+  @JsonbProperty("post_time")
   private long postTime;
+  @JsonbProperty("size_mb")
   private long sizeMb;
   private P2pGroup group;
 

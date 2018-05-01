@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 saftsau
+ * Copyright 2017, 2018 saftsau
  *
  * This file is part of xREL4J.
  *
@@ -20,6 +20,7 @@ package com.github.saftsau.xrel4j.release;
 import com.github.saftsau.xrel4j.release.p2p.P2pRelease;
 import com.github.saftsau.xrel4j.release.scene.Release;
 import java.util.List;
+import javax.json.bind.annotation.JsonbProperty;
 
 /**
  * Class represents an object containing two lists of {@link Release} and {@link P2pRelease}. This
@@ -30,6 +31,7 @@ public class ReleaseSearchResult {
 
   private int total;
   private List<Release> results;
+  @JsonbProperty("p2p_results")
   private List<P2pRelease> p2pResults;
 
   /**

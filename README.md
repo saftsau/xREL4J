@@ -16,7 +16,9 @@ In order to use xREL4J you need a couple of prerequisites:
 
 - Minimum required Java version is Java 8.
 
-- A JSON-P (JSR-374) implementation, e.g. [Glassfish JSON-P](https://github.com/javaee/jsonp). Any other JSON-P implementation should theoretically work, although only Glassfish JSON-P has been tested.
+- A JAX-RS (JSR-339) implementation, e.g. [Jersey](https://jersey.github.io). Any other JAX-RS implementation should theoretically work, although only Jersey has been tested.
+
+- A JSON-P (JSR-374) implementation, e.g. [Eclipse JSON-P](https://projects.eclipse.org/projects/ee4j.jsonp). Any other JSON-P implementation should theoretically work, although only Glassfish JSON-P has been tested.
 
 - A JSON-B (JSR-367) implementation, e.g. [Eclipse Yasson](https://projects.eclipse.org/projects/ee4j.yasson). Any other JSON-B implementation should theoretically work, although only Eclipse Yasson has been tested.
 
@@ -27,9 +29,9 @@ Setup
 
     git clone https://github.com/saftsau/xREL4J.git
 
-- Get your favored JSON-B + JSON-P implementation.
+- Get your favored JAX-RS + JSON-B + JSON-P implementation.
 
-- Add xREL4J and your chosen JSON-B library to your project.
+- Add xREL4J and your chosen implementation libraries to your project.
 
 - That's it!
 

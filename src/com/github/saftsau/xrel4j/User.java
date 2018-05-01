@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 saftsau
+ * Copyright 2017, 2018 saftsau
  *
  * This file is part of xREL4J.
  *
@@ -17,6 +17,8 @@
 
 package com.github.saftsau.xrel4j;
 
+import javax.json.bind.annotation.JsonbProperty;
+
 /**
  * Class represents a user as returned by the xREL API. This is implemented using a singleton
  * pattern.
@@ -27,7 +29,9 @@ public class User {
   private String name;
   private String secret;
   private String locale;
+  @JsonbProperty("avatar_url")
   private String avatarUrl;
+  @JsonbProperty("avatar_thumb_url")
   private String avatarThumbUrl;
 
   /**

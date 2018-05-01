@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 saftsau
+ * Copyright 2017, 2018 saftsau
  *
  * This file is part of xREL4J.
  *
@@ -18,6 +18,7 @@
 package com.github.saftsau.xrel4j;
 
 import java.util.List;
+import javax.json.bind.annotation.JsonbProperty;
 
 /**
  * Class used for storing a paginated list of any content.
@@ -26,6 +27,7 @@ import java.util.List;
  */
 public class PaginationList<T> {
 
+  @JsonbProperty("total_count")
   private long totalCount;
   private Pagination pagination;
   private List<T> list;

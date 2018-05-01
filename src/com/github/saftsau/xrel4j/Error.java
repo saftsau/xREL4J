@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 saftsau
+ * Copyright 2017, 2018 saftsau
  *
  * This file is part of xREL4J.
  *
@@ -17,6 +17,8 @@
 
 package com.github.saftsau.xrel4j;
 
+import javax.json.bind.annotation.JsonbProperty;
+
 /**
  * Class represents an Error. Used for all information the xREL API offers when returning errors.
  * 
@@ -25,7 +27,9 @@ package com.github.saftsau.xrel4j;
 public class Error {
 
   public String error;
+  @JsonbProperty("error_description")
   public String errorDescription;
+  @JsonbProperty("error_type")
   public String errorType;
 
   /**

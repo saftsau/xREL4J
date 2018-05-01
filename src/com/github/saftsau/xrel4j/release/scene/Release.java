@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 saftsau
+ * Copyright 2017, 2018 saftsau
  *
  * This file is part of xREL4J.
  *
@@ -20,6 +20,7 @@ package com.github.saftsau.xrel4j.release.scene;
 import com.github.saftsau.xrel4j.release.ReleaseBase;
 import com.github.saftsau.xrel4j.release.Size;
 import java.util.Map;
+import javax.json.bind.annotation.JsonbProperty;
 
 /**
  * Class represents a release with all its information provided by the xREL API.
@@ -27,11 +28,16 @@ import java.util.Map;
 public class Release extends ReleaseBase {
 
   private long time;
+  @JsonbProperty("group_name")
   private String groupName;
+  @JsonbProperty("nuke_reason")
   private String nukeReason;
   private Size size;
+  @JsonbProperty("video_type")
   private String videoType;
+  @JsonbProperty("audio_type")
   private String audioType;
+  @JsonbProperty("proof_url")
   private String proofUrl;
   private Map<String, Boolean> flags;
 

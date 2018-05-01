@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 saftsau
+ * Copyright 2017, 2018 saftsau
  *
  * This file is part of xREL4J.
  *
@@ -15,7 +15,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.github.saftsau.xrel4j;
+package com.github.saftsau.xrel4j.favorite;
 
 import com.github.saftsau.xrel4j.extinfo.ExtInfo;
 import com.github.saftsau.xrel4j.release.p2p.P2pRelease;
@@ -32,11 +32,16 @@ public class Favorite {
   @JsonbProperty("public")
   private boolean public_;
   private boolean notify;
+  @JsonbProperty("auto_read")
   private boolean autoRead;
+  @JsonbProperty("include_p2p")
   private boolean includeP2p;
   private String description;
+  @JsonbProperty("password_hash")
   private String passwordHash;
+  @JsonbProperty("entry_count")
   private long entryCount;
+  @JsonbProperty("unread_releases")
   private long unreadReleases;
   private List<ExtInfo> entries;
 

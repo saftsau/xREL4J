@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 saftsau
+ * Copyright 2017, 2018 saftsau
  *
  * This file is part of xREL4J.
  *
@@ -17,12 +17,16 @@
 
 package com.github.saftsau.xrel4j.release.p2p;
 
+import javax.json.bind.annotation.JsonbProperty;
+
 /**
  * Class represents a category as used in the P2P section on xREL.
  */
 public class P2pCategory {
 
+  @JsonbProperty("meta_cat")
   private String metaCat;
+  @JsonbProperty("sub_cat")
   private String subCat;
   private String id;
 

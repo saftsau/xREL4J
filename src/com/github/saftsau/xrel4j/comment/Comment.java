@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 saftsau
+ * Copyright 2017, 2018 saftsau
  *
  * This file is part of xREL4J.
  *
@@ -19,6 +19,7 @@ package com.github.saftsau.xrel4j.comment;
 
 import com.github.saftsau.xrel4j.release.p2p.P2pRelease;
 import com.github.saftsau.xrel4j.release.scene.Release;
+import javax.json.bind.annotation.JsonbProperty;
 
 /**
  * Class represents a comment on any {@link Release} or {@link P2pRelease}.
@@ -29,6 +30,7 @@ public class Comment {
   private long time;
   private Author author;
   private String text;
+  @JsonbProperty("link_href")
   private String linkHref;
   private Rating rating;
   private Votes votes;

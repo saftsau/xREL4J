@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 saftsau
+ * Copyright 2017, 2018 saftsau
  *
  * This file is part of xREL4J.
  *
@@ -17,15 +17,21 @@
 
 package com.github.saftsau.xrel4j;
 
+import javax.json.bind.annotation.JsonbProperty;
+
 /**
  * Class represents a Token used by the xREL API to access protected methods or additional user
  * data.
  */
 public class Token {
 
+  @JsonbProperty("access_token")
   private String accessToken;
+  @JsonbProperty("token_type")
   private String tokenType;
+  @JsonbProperty("expires_in")
   private int expiresIn;
+  @JsonbProperty("refresh_token")
   private String refreshToken;
   private long creationTime;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 saftsau
+ * Copyright 2017, 2018 saftsau
  *
  * This file is part of xREL4J.
  *
@@ -18,13 +18,20 @@
 package com.github.saftsau.xrel4j.extinfo;
 
 import java.time.LocalDate;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  * Class represents a release date an {@link ExtInfo} can contain.
  */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlRootElement
 public class ReleaseDate {
 
   private String type;
+  @XmlJavaTypeAdapter(value = LocalDateAdapter.class)
   private LocalDate date;
 
   /**

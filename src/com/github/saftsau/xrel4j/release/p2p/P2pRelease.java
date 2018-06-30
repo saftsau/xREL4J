@@ -19,20 +19,30 @@ package com.github.saftsau.xrel4j.release.p2p;
 
 import com.github.saftsau.xrel4j.release.ReleaseBase;
 import javax.json.bind.annotation.JsonbProperty;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Class represents a P2P release with all its information provided by the xREL API.
  */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlRootElement(name = "p2p_rls")
 public class P2pRelease extends ReleaseBase {
 
   private P2pCategory category;
   @JsonbProperty("main_lang")
+  @XmlElement(name = "main_lang")
   private String mainLang;
   @JsonbProperty("pub_time")
+  @XmlElement(name = "pub_time")
   private long pubTime;
   @JsonbProperty("post_time")
+  @XmlElement(name = "post_time")
   private long postTime;
   @JsonbProperty("size_mb")
+  @XmlElement(name = "size_mb")
   private long sizeMb;
   private P2pGroup group;
 

@@ -18,15 +18,23 @@
 package com.github.saftsau.xrel4j.release.p2p;
 
 import javax.json.bind.annotation.JsonbProperty;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Class represents a category as used in the P2P section on xREL.
  */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlRootElement(name = "category")
 public class P2pCategory {
 
   @JsonbProperty("meta_cat")
+  @XmlElement(name = "meta_cat")
   private String metaCat;
   @JsonbProperty("sub_cat")
+  @XmlElement(name = "sub_cat")
   private String subCat;
   private String id;
 

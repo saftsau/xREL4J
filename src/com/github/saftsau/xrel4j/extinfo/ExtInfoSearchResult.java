@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 saftsau
+ * Copyright 2017, 2018 saftsau
  *
  * This file is part of xREL4J.
  *
@@ -18,14 +18,23 @@
 package com.github.saftsau.xrel4j.extinfo;
 
 import java.util.List;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Class represents an object containing a lists of {@link ExtInfo}. This is used for
  * {@link ExtInfo} search operations on the xREL API.
  */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlRootElement(name = "ext_info_search")
 public class ExtInfoSearchResult {
 
   private int total;
+  @XmlElement(name = "ext_info", type = ExtInfo.class)
+  @XmlElementWrapper
   private List<ExtInfo> results;
 
   /**

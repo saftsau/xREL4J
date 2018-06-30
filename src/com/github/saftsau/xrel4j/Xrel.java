@@ -30,6 +30,10 @@ import com.github.saftsau.xrel4j.release.p2p.P2pGroup;
 import com.github.saftsau.xrel4j.release.p2p.P2pRelease;
 import com.github.saftsau.xrel4j.release.scene.Release;
 import com.github.saftsau.xrel4j.release.scene.ReleaseAddProof;
+import java.io.UnsupportedEncodingException;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +52,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Java implementation of the xREL API v2. Method and parameter names are based on the xREL API with
@@ -59,7 +64,7 @@ import javax.ws.rs.core.Response.Status;
 public class Xrel {
 
   private final String xrelUrl = "https://api.xrel.to/v2";
-  private final MediaType format = MediaType.APPLICATION_JSON_TYPE;
+  private final MediaType format;
   private final int paginationPerPageMin = 5;
   private final int paginationPerPageMax = 100;
   private final String responseType = "code";
@@ -72,9 +77,19 @@ public class Xrel {
   /**
    * Constructs a new xREL object without any oAuth information.
    * 
+   * @param mediaType The {@link MediaType} to use. Must be either application/json or text/xml.
+   * @throws UnsupportedEncodingException If the given encoding is neither application/json nor
+   *         application/xml.
+   * 
    * @see <a href="https://www.xrel.to/wiki/6436/api-oauth2.html">API: OAuth 2.0</a>
    */
-  public Xrel() {
+  public Xrel(MediaType mediaType) throws UnsupportedEncodingException {
+    if (mediaType.equals(MediaType.APPLICATION_JSON_TYPE)
+        || mediaType.equals(MediaType.TEXT_XML_TYPE)) {
+      this.format = mediaType;
+    } else {
+      throw new UnsupportedEncodingException("Encoding must be application/json or text/xml");
+    }
     this.clientId = Optional.empty();
   }
 
@@ -82,11 +97,21 @@ public class Xrel {
   /**
    * Constructs a new xREL object with oAuth information and no scopes.
    * 
+   * @param mediaType The {@link MediaType} to use. Must be either application/json or text/xml.
    * @param clientId Your consumer key.
    * @param clientSecret Your consumer secret.
+   * @throws UnsupportedEncodingException If the given encoding is neither application/json nor
+   *         application/xml.
    * @see <a href="https://www.xrel.to/wiki/6436/api-oauth2.html">API: OAuth 2.0</a>
    */
-  public Xrel(String clientId, String clientSecret) {
+  public Xrel(MediaType mediaType, String clientId, String clientSecret)
+      throws UnsupportedEncodingException {
+    if (mediaType.equals(MediaType.APPLICATION_JSON_TYPE)
+        || mediaType.equals(MediaType.TEXT_XML_TYPE)) {
+      this.format = mediaType;
+    } else {
+      throw new UnsupportedEncodingException("Encoding must be application/json or text/xml");
+    }
     this.clientId = Optional.of(clientId);
     this.clientSecret = Optional.of(clientSecret);
     this.redirectUri = Optional.empty();
@@ -97,16 +122,25 @@ public class Xrel {
   /**
    * Constructs a new xREL object with oAuth information and no scopes.
    * 
+   * @param mediaType The {@link MediaType} to use. Must be either application/json or text/xml.
    * @param clientId Your consumer key.
    * @param clientSecret Your consumer secret.
    * @param redirectUri Optional URI to redirect to after the authentication. Please read the Guide
    *        for more details.
    * @param state Optionally any string. You may set this value to any value, and it will be
    *        returned after the authentication. It might also be useful to prevent CSRF attacks.
+   * @throws UnsupportedEncodingException If the given encoding is neither application/json nor
+   *         application/xml.
    * @see <a href="https://www.xrel.to/wiki/6436/api-oauth2.html">API: OAuth 2.0</a>
    */
-  public Xrel(String clientId, String clientSecret, Optional<String> redirectUri,
-      Optional<String> state) {
+  public Xrel(MediaType mediaType, String clientId, String clientSecret,
+      Optional<String> redirectUri, Optional<String> state) throws UnsupportedEncodingException {
+    if (mediaType.equals(MediaType.APPLICATION_JSON_TYPE)
+        || mediaType.equals(MediaType.TEXT_XML_TYPE)) {
+      this.format = mediaType;
+    } else {
+      throw new UnsupportedEncodingException("Encoding must be application/json or text/xml");
+    }
     this.clientId = Optional.of(clientId);
     this.clientSecret = Optional.of(clientSecret);
     this.redirectUri = redirectUri;
@@ -116,16 +150,26 @@ public class Xrel {
 
   /**
    * Constructs a new xREL object. If you have oAuth access but no additional scopes you should use
-   * {@link #Xrel(String, String, Optional, Optional)}.
+   * {@link #Xrel(MediaType, String, String, Optional, Optional)}.
    * 
+   * @param mediaType The {@link MediaType} to use. Must be either application/json or text/xml.
    * @param clientId Your consumer key.
    * @param clientSecret Your consumer secret.
    * @param scope Needed to access protected methods. If you do have scope access: you MUST supply
    *        these while processing the Tokens, even if you only plan to use them at a later stage.
    *        Rule of thumb: if you have these, always add them here.
+   * @throws UnsupportedEncodingException If the given encoding is neither application/json nor
+   *         application/xml.
    * @see <a href="https://www.xrel.to/wiki/6436/api-oauth2.html">API: OAuth 2.0</a>
    */
-  public Xrel(String clientId, String clientSecret, String[] scope) {
+  public Xrel(MediaType mediaType, String clientId, String clientSecret, String[] scope)
+      throws UnsupportedEncodingException {
+    if (mediaType.equals(MediaType.APPLICATION_JSON_TYPE)
+        || mediaType.equals(MediaType.TEXT_XML_TYPE)) {
+      this.format = mediaType;
+    } else {
+      throw new UnsupportedEncodingException("Encoding must be application/json or text/xml");
+    }
     this.clientId = Optional.of(clientId);
     this.clientSecret = Optional.of(clientSecret);
     this.redirectUri = Optional.empty();
@@ -135,8 +179,9 @@ public class Xrel {
 
   /**
    * Constructs a new xREL object. If you have oAuth access but no additional scopes you should use
-   * {@link #Xrel(String, String, Optional, Optional)}.
+   * {@link #Xrel(MediaType, String, String, Optional, Optional)}.
    * 
+   * @param mediaType The {@link MediaType} to use. Must be either application/json or text/xml.
    * @param clientId Your consumer key.
    * @param clientSecret Your consumer secret.
    * @param redirectUri Optional URI to redirect to after the authentication. Please read the Guide
@@ -146,10 +191,19 @@ public class Xrel {
    * @param scope Needed to access protected methods. If you do have scope access: you MUST supply
    *        these while processing the Tokens, even if you only plan to use them at a later stage.
    *        Rule of thumb: if you have these, always add them here.
+   * @throws UnsupportedEncodingException If the given encoding is neither application/json nor
+   *         application/xml.
    * @see <a href="https://www.xrel.to/wiki/6436/api-oauth2.html">API: OAuth 2.0</a>
    */
-  public Xrel(String clientId, String clientSecret, Optional<String> redirectUri,
-      Optional<String> state, String[] scope) {
+  public Xrel(MediaType mediaType, String clientId, String clientSecret,
+      Optional<String> redirectUri, Optional<String> state, String[] scope)
+      throws UnsupportedEncodingException {
+    if (mediaType.equals(MediaType.APPLICATION_JSON_TYPE)
+        || mediaType.equals(MediaType.TEXT_XML_TYPE)) {
+      this.format = mediaType;
+    } else {
+      throw new UnsupportedEncodingException("Encoding must be application/json or text/xml");
+    }
     this.clientId = Optional.of(clientId);
     this.clientSecret = Optional.of(clientSecret);
     this.redirectUri = redirectUri;
@@ -378,6 +432,74 @@ public class Xrel {
   }
 
   /**
+   * Changes the name of an {@link XmlRootElement} annotation of a given class. This is used,
+   * because in XML we have root elements that we need to map, while in JSON this is not present.
+   * This is used as a workaround and uses Java internals that can possibly break on any new Java
+   * version.
+   * 
+   * @param clazz The class to alter
+   * @param name The name of the root element
+   * @throws XrelException
+   */
+  private void changeXmlRootName(@SuppressWarnings("rawtypes") Class clazz, String name)
+      throws XrelException {
+    // If we are not using XML we do not have to alter anything
+    if (!getFormat().equals(MediaType.TEXT_XML_TYPE)) {
+      return;
+    }
+
+    // Get the already present XmlRootElement annotation
+    Annotation annotation = null;
+    for (Annotation currentAnnotation : clazz.getAnnotations()) {
+      if (currentAnnotation.annotationType().isAssignableFrom(XmlRootElement.class)) {
+        annotation = currentAnnotation;
+        break;
+      }
+    }
+    if (annotation == null) {
+      throw new IllegalArgumentException("Given class has no XmlRootElement");
+    }
+
+    // Construct the new Annotation
+    final XmlRootElement xmlRootElement = (XmlRootElement) annotation;
+    Annotation newAnnotation = new XmlRootElement() {
+      @Override
+      public Class<? extends Annotation> annotationType() {
+        return xmlRootElement.annotationType();
+      }
+
+      @Override
+      public String namespace() {
+        return xmlRootElement.namespace();
+      }
+
+      @Override
+      public String name() {
+        return name;
+      }
+    };
+
+    try {
+      // Reflection to get the private method
+      Method method = Class.class.getDeclaredMethod("annotationData");
+      method.setAccessible(true);
+      Object annotationData = method.invoke(clazz);
+
+      // Get the present annotations
+      Field annotations = annotationData.getClass().getDeclaredField("annotations");
+      annotations.setAccessible(true);
+      @SuppressWarnings("unchecked")
+      Map<Class<? extends Annotation>, Annotation> annotationDataMap =
+          (Map<Class<? extends Annotation>, Annotation>) annotations.get(annotationData);
+
+      // Set the new annotation
+      annotationDataMap.put(XmlRootElement.class, newAnnotation);
+    } catch (Exception e) {
+      throw new XrelException(e);
+    }
+  }
+
+  /**
    * Returns information about a single release, specified by the complete dirname or an API release
    * id.
    * 
@@ -471,8 +593,10 @@ public class Xrel {
     }
 
     Response response = invocationBuilder.get();
+    changeXmlRootName(PaginationList.class, "releases");
     PaginationList<Release> releaseList =
         handleResponse(new GenericType<PaginationList<Release>>() {}, response);
+    changeXmlRootName(PaginationList.class, "##default");
 
     return releaseList;
   }
@@ -679,8 +803,10 @@ public class Xrel {
 
     Invocation.Builder invocationBuilder = webTarget.request(getFormat());
     Response response = invocationBuilder.get();
+    changeXmlRootName(PaginationList.class, "releases");
     PaginationList<Release> releaseList =
         handleResponse(new GenericType<PaginationList<Release>>() {}, response);
+    changeXmlRootName(PaginationList.class, "##default");
 
     return releaseList;
   }
@@ -744,8 +870,10 @@ public class Xrel {
 
     Invocation.Builder invocationBuilder = webTarget.request(getFormat());
     Response response = invocationBuilder.get();
+    changeXmlRootName(PaginationList.class, "releases");
     PaginationList<Release> releaseList =
         handleResponse(new GenericType<PaginationList<Release>>() {}, response);
+    changeXmlRootName(PaginationList.class, "##default");
 
     return releaseList;
   }
@@ -846,8 +974,10 @@ public class Xrel {
 
     Invocation.Builder invocationBuilder = webTarget.request(getFormat());
     Response response = invocationBuilder.get();
+    changeXmlRootName(PaginationList.class, "p2p_releases");
     PaginationList<P2pRelease> p2pList =
         handleResponse(new GenericType<PaginationList<P2pRelease>>() {}, response);
+    changeXmlRootName(PaginationList.class, "##default");
 
     return p2pList;
   }
@@ -1566,8 +1696,14 @@ public class Xrel {
     Invocation.Builder invocationBuilder = webTarget.request(getFormat());
     invocationBuilder.header(HttpHeaders.AUTHORIZATION, "Bearer " + token.getAccessToken());
     Response response = invocationBuilder.post(entity);
+    if (delete) {
+      changeXmlRootName(FavoriteAddDelEntry.class, "fav_list_delentry");
+    } else {
+      changeXmlRootName(FavoriteAddDelEntry.class, "fav_list_addentry");
+    }
     FavoriteAddDelEntry favoriteAddDelEntry =
         handleResponse(new GenericType<FavoriteAddDelEntry>() {}, response);
+    changeXmlRootName(FavoriteAddDelEntry.class, "##default");
 
     return favoriteAddDelEntry;
   }
@@ -1723,8 +1859,10 @@ public class Xrel {
     webTarget = webTarget.queryParam("page", normalizedPageValues[1]);
     Invocation.Builder invocationBuilder = webTarget.request(getFormat());
     Response response = invocationBuilder.get();
+    changeXmlRootName(PaginationList.class, "comments");
     PaginationList<Comment> commentList =
         handleResponse(new GenericType<PaginationList<Comment>>() {}, response);
+    changeXmlRootName(PaginationList.class, "##default");
 
     return commentList;
   }

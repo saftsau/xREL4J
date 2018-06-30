@@ -20,15 +20,22 @@ package com.github.saftsau.xrel4j.release.scene;
 import com.github.saftsau.xrel4j.Xrel;
 import java.util.List;
 import javax.json.bind.annotation.JsonbProperty;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Class represents an
  * {@link Xrel#postReleaseAddProof(List, String, com.github.saftsau.xrel4j.Token)} result as
  * provided by the xREL API.
  */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlRootElement
 public class ReleaseAddProof {
 
   @JsonbProperty("proof_url")
+  @XmlElement(name = "proof_url")
   private String proofUrl;
   private List<Release> releases;
 

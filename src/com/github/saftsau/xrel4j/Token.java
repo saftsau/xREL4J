@@ -18,20 +18,30 @@
 package com.github.saftsau.xrel4j;
 
 import javax.json.bind.annotation.JsonbProperty;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Class represents a Token used by the xREL API to access protected methods or additional user
  * data.
  */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlRootElement
 public class Token {
 
   @JsonbProperty("access_token")
+  @XmlElement(name = "access_token")
   private String accessToken;
   @JsonbProperty("token_type")
+  @XmlElement(name = "token_type")
   private String tokenType;
   @JsonbProperty("expires_in")
+  @XmlElement(name = "expires_in")
   private int expiresIn;
   @JsonbProperty("refresh_token")
+  @XmlElement(name = "refresh_token")
   private String refreshToken;
   private long creationTime;
 

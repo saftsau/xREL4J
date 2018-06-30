@@ -18,15 +18,22 @@
 package com.github.saftsau.xrel4j.extinfo;
 
 import javax.json.bind.annotation.JsonbProperty;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Class represents external info an {@link ExtInfo} can contain. Used for adding plots from other
  * websites.
  */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlRootElement
 public class External {
 
   private External external;
   @JsonbProperty("link_url")
+  @XmlElement(name = "link_url")
   private String linkUrl;
   private String plot;
 

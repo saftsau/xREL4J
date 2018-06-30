@@ -54,6 +54,16 @@ public class XrelException extends Exception {
   }
 
   /**
+   * Constructs an XrelException based on another Throwable.
+   * 
+   * @param throwable The parent {@link Throwable}
+   */
+  public XrelException(Throwable throwable) {
+    super(throwable);
+    this.error = Optional.empty();
+  }
+
+  /**
    * Constructs an XrelException with the response code from the xREL API but no content. This is
    * generally used, when we can't unmarshal the object that was returned.
    * 

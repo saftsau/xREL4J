@@ -18,17 +18,26 @@
 package com.github.saftsau.xrel4j;
 
 import javax.json.bind.annotation.JsonbProperty;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Class used for any other classes that use pagination in their results.
  */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlRootElement
 public class Pagination {
 
   @JsonbProperty("current_page")
+  @XmlElement(name = "current_page")
   private int currentPage;
   @JsonbProperty("per_page")
+  @XmlElement(name = "per_page")
   private int perPage;
   @JsonbProperty("total_pages")
+  @XmlElement(name = "total_pages")
   private long totalPages;
 
   /**

@@ -20,16 +20,25 @@ package com.github.saftsau.xrel4j;
 import java.util.Map;
 import javax.json.bind.annotation.JsonbProperty;
 import javax.json.bind.annotation.JsonbTransient;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * Class represents a category as used in the Release section on xREL.
  */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlRootElement(name = "category")
 public class ReleaseCategory {
 
   private String name;
   @JsonbTransient
+  @XmlTransient
   private ReleaseCategory parentCat;
   @JsonbProperty(value = "parent_cat")
+  @XmlElement(name = "parent_cat")
   private String parentCatName;
 
   /**

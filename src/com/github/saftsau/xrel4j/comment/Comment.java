@@ -20,10 +20,16 @@ package com.github.saftsau.xrel4j.comment;
 import com.github.saftsau.xrel4j.release.p2p.P2pRelease;
 import com.github.saftsau.xrel4j.release.scene.Release;
 import javax.json.bind.annotation.JsonbProperty;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Class represents a comment on any {@link Release} or {@link P2pRelease}.
  */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlRootElement(name = "comment")
 public class Comment {
 
   private String id;
@@ -31,6 +37,7 @@ public class Comment {
   private Author author;
   private String text;
   @JsonbProperty("link_href")
+  @XmlElement(name = "link_href")
   private String linkHref;
   private Rating rating;
   private Votes votes;

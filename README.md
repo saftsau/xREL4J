@@ -18,9 +18,18 @@ In order to use xREL4J you need a couple of prerequisites:
 
 - A JAX-RS (JSR-339) implementation, e.g. [Jersey](https://jersey.github.io). Any other JAX-RS implementation should theoretically work, although only Jersey has been tested.
 
-- A JSON-P (JSR-374) implementation, e.g. [Eclipse JSON-P](https://projects.eclipse.org/projects/ee4j.jsonp). Any other JSON-P implementation should theoretically work, although only Glassfish JSON-P has been tested.
+- If you want to use JSON you have to add:
 
-- A JSON-B (JSR-367) implementation, e.g. [Eclipse Yasson](https://projects.eclipse.org/projects/ee4j.yasson). Any other JSON-B implementation should theoretically work, although only Eclipse Yasson has been tested.
+    - A JSON-P (JSR-374) implementation, e.g. [Eclipse JSON-P](https://projects.eclipse.org/projects/ee4j.jsonp). Any other JSON-P implementation should theoretically work, although only Eclipse JSON-P has been tested.
+
+    - A JSON-B (JSR-367) implementation, e.g. [Eclipse Yasson](https://projects.eclipse.org/projects/ee4j.yasson). Any other JSON-B implementation should theoretically work, although only Eclipse Yasson has been tested.
+
+- If you want to use XML you have to add:
+
+    - A JAXB (JSR-222) implementation, e.g. [JAXB RI](https://javaee.github.io/jaxb-v2/). Any other JAXB implementation should theoretically work, although only JAXB RI has been tested.
+
+Keep in mind that the oauth2/token endpoint always returns JSON. If you intend to use that, you have to add JSON-P and JSON-B, but you can still use JAXB for all other requests. If you don't plan on using this method, you can solely rely on JAXB.
+There are also some internal Java methods used for making XML work without breaking JSON compatibility or having to maintain two completely different implementations. This means, that there might be breakage in later Java versions.
 
 Setup
 -----

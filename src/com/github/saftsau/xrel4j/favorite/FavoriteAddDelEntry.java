@@ -19,15 +19,23 @@ package com.github.saftsau.xrel4j.favorite;
 
 import com.github.saftsau.xrel4j.extinfo.ExtInfo;
 import javax.json.bind.annotation.JsonbProperty;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Class represents the Response you get when adding or deleting an entry.
  */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlRootElement
 public class FavoriteAddDelEntry {
 
   @JsonbProperty(value = "fav_list")
+  @XmlElement(name = "fav_list")
   private Favorite favList;
   @JsonbProperty(value = "ext_info")
+  @XmlElement(name = "ext_info")
   private ExtInfo extInfo;
 
   /**

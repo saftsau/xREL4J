@@ -18,13 +18,20 @@
 package com.github.saftsau.xrel4j.favorite;
 
 import javax.json.bind.annotation.JsonbProperty;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Class represents the Response you get when marking an entry as read.
  */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlRootElement(name = "fav_list_markread")
 public class FavoriteMarkRead {
 
   @JsonbProperty(value = "fav_list")
+  @XmlElement(name = "fav_list")
   private Favorite favList;
 
   /**

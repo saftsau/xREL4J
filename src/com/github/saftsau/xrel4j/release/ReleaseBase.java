@@ -21,28 +21,39 @@ import com.github.saftsau.xrel4j.extinfo.ExtInfo;
 import com.github.saftsau.xrel4j.release.p2p.P2pRelease;
 import com.github.saftsau.xrel4j.release.scene.Release;
 import javax.json.bind.annotation.JsonbProperty;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 
 /**
  * Class represents a base release which contains information shared by {@link Release} and
  * {@link P2pRelease}. This is used as the parent class of these two classes.
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public abstract class ReleaseBase {
 
   private String id;
   private String dirname;
   @JsonbProperty("link_href")
+  @XmlElement(name = "link_href")
   private String linkHref;
   @JsonbProperty("num_ratings")
+  @XmlElement(name = "num_ratings")
   private int numRatings;
   @JsonbProperty("video_rating")
+  @XmlElement(name = "video_rating")
   private double videoRating;
   @JsonbProperty("audio_rating")
+  @XmlElement(name = "audio_rating")
   private double audioRating;
   @JsonbProperty("ext_info")
+  @XmlElement(name = "ext_info")
   private ExtInfo extInfo;
   @JsonbProperty("tv_season")
+  @XmlElement(name = "tv_season")
   private int tvSeason;
   @JsonbProperty("tv_episode")
+  @XmlElement(name = "tv_episode")
   private int tvEpisode;
   private int comments;
 

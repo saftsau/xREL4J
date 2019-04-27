@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, 2018 saftsau
+ * Copyright 2017 - 2019 saftsau
  *
  * This file is part of xREL4J.
  *
@@ -17,54 +17,40 @@
 
 package com.github.saftsau.xrel4j.extinfo;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.saftsau.xrel4j.release.p2p.P2pRelease;
 import com.github.saftsau.xrel4j.release.scene.Release;
 import java.util.List;
-import javax.json.bind.annotation.JsonbProperty;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Class represents an ExtInfo, used for all information xREL has about any product (movie, game,
  * ...).
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "ext_info")
 public class ExtInfo {
 
   private String type;
   private String id;
   private String title;
-  @JsonbProperty("link_href")
-  @XmlElement(name = "link_href")
+  @JsonProperty("link_href")
   private String linkHref;
   private String genre;
-  @JsonbProperty("alt_title")
-  @XmlElement(name = "alt_title")
+  @JsonProperty("alt_title")
   private String altTitle;
-  @JsonbProperty("cover_url")
-  @XmlElement(name = "cover_url")
+  @JsonProperty("cover_url")
   private String coverUrl;
   private List<String> uris;
   private double rating;
-  @JsonbProperty("own_rating")
-  @XmlElement(name = "own_rating")
+  @JsonProperty("own_rating")
   private int ownRating;
-  @JsonbProperty("num_ratings")
-  @XmlElement(name = "num_ratings")
+  @JsonProperty("num_ratings")
   private long numRatings;
-  @JsonbProperty("release_dates")
-  @XmlElement(name = "release_dates")
+  @JsonProperty("release_dates")
   private List<ReleaseDate> releaseDates;
   private List<External> externals;
-  @JsonbProperty("ext_info_media")
-  @XmlElement(name = "ext_info_media")
+  @JsonProperty("ext_info_media")
   private List<ExtInfoMedia> extInfoMedia;
   private List<Release> releases;
-  @JsonbProperty("p2p_releases")
-  @XmlElement(name = "p2p_releases")
+  @JsonProperty("p2p_releases")
   private List<P2pRelease> p2pReleases;
 
   /**

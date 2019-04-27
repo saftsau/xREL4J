@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 saftsau
+ * Copyright 2018, 2019 saftsau
  *
  * This file is part of xREL4J.
  *
@@ -17,27 +17,20 @@
 
 package com.github.saftsau.xrel4j.release.scene;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.saftsau.xrel4j.Xrel;
 import java.util.List;
-import javax.json.bind.annotation.JsonbProperty;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Class represents an
  * {@link Xrel#postReleaseAddProof(List, String, com.github.saftsau.xrel4j.Token)} result as
  * provided by the xREL API.
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement
 public class ReleaseAddProof {
 
-  @JsonbProperty("proof_url")
-  @XmlElement(name = "proof_url")
+  @JsonProperty("proof_url")
   private String proofUrl;
-  private List<Release> releases;
+  private List<String> releases;
 
   /**
    * Gets the URL of the proof image.
@@ -58,20 +51,20 @@ public class ReleaseAddProof {
   }
 
   /**
-   * Gets the {@link List} of {@link Release} this proof belongs to.
+   * Gets the {@link List} of release IDs this proof belongs to.
    * 
    * @return The releases
    */
-  public List<Release> getReleases() {
+  public List<String> getReleases() {
     return releases;
   }
 
   /**
-   * Sets the {@link List} of {@link Release} this proof belongs to.
+   * Sets the {@link List} of release IDs this proof belongs to.
    * 
    * @param releases The releases to set
    */
-  public void setReleases(List<Release> releases) {
+  public void setReleases(List<String> releases) {
     this.releases = releases;
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, 2018 saftsau
+ * Copyright 2017 - 2019 saftsau
  *
  * This file is part of xREL4J.
  *
@@ -17,42 +17,35 @@
 
 package com.github.saftsau.xrel4j.extinfo;
 
-import javax.json.bind.annotation.JsonbProperty;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Class represents external info an {@link ExtInfo} can contain. Used for adding plots from other
  * websites.
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement
 public class External {
 
-  private External external;
-  @JsonbProperty("link_url")
-  @XmlElement(name = "link_url")
+  private ExternalSource source;
+  @JsonProperty("link_url")
   private String linkUrl;
   private String plot;
 
   /**
    * Gets the information about the external this information comes from.
    * 
-   * @return The external
+   * @return The source
    */
-  public External getExternal() {
-    return external;
+  public ExternalSource getSource() {
+    return source;
   }
 
   /**
    * Sets the information about the external this information comes from.
    * 
-   * @param external The external to set
+   * @param source The source to set
    */
-  public void setExternal(External external) {
-    this.external = external;
+  public void setSource(ExternalSource source) {
+    this.source = source;
   }
 
   /**
@@ -95,7 +88,7 @@ public class External {
 
   @Override
   public String toString() {
-    return "External [getExternal()=" + getExternal() + ", getLinkUrl()=" + getLinkUrl()
+    return "External [getSource()=" + getSource() + ", getLinkUrl()=" + getLinkUrl()
         + ", getPlot()=" + getPlot() + "]";
   }
 }

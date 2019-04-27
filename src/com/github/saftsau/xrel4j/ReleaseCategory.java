@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, 2018 saftsau
+ * Copyright 2017 - 2019 saftsau
  *
  * This file is part of xREL4J.
  *
@@ -17,28 +17,19 @@
 
 package com.github.saftsau.xrel4j;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Map;
-import javax.json.bind.annotation.JsonbProperty;
-import javax.json.bind.annotation.JsonbTransient;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * Class represents a category as used in the Release section on xREL.
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "category")
 public class ReleaseCategory {
 
   private String name;
-  @JsonbTransient
-  @XmlTransient
+  @JsonIgnore
   private ReleaseCategory parentCat;
-  @JsonbProperty(value = "parent_cat")
-  @XmlElement(name = "parent_cat")
+  @JsonProperty(value = "parent_cat")
   private String parentCatName;
 
   /**

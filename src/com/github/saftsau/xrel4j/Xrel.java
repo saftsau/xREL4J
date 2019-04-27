@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, 2018 saftsau
+ * Copyright 2017 - 2019 saftsau
  *
  * This file is part of xREL4J.
  *
@@ -30,29 +30,16 @@ import com.github.saftsau.xrel4j.release.p2p.P2pGroup;
 import com.github.saftsau.xrel4j.release.p2p.P2pRelease;
 import com.github.saftsau.xrel4j.release.scene.Release;
 import com.github.saftsau.xrel4j.release.scene.ReleaseAddProof;
-import java.io.UnsupportedEncodingException;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import javax.ws.rs.ProcessingException;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.Invocation;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Form;
-import javax.ws.rs.core.GenericType;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.xml.bind.annotation.XmlRootElement;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Response;
 
 /**
  * Java implementation of the xREL API v2. Method and parameter names are based on the xREL API with
@@ -63,8 +50,6 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 public class Xrel {
 
-  private final String xrelUrl = "https://api.xrel.to/v2";
-  private final MediaType format;
   private final int paginationPerPageMin = 5;
   private final int paginationPerPageMax = 100;
   private final String responseType = "code";
@@ -77,19 +62,9 @@ public class Xrel {
   /**
    * Constructs a new xREL object without any oAuth information.
    * 
-   * @param mediaType The {@link MediaType} to use. Must be either application/json or text/xml.
-   * @throws UnsupportedEncodingException If the given encoding is neither application/json nor
-   *         application/xml.
-   * 
    * @see <a href="https://www.xrel.to/wiki/6436/api-oauth2.html">API: OAuth 2.0</a>
    */
-  public Xrel(MediaType mediaType) throws UnsupportedEncodingException {
-    if (mediaType.equals(MediaType.APPLICATION_JSON_TYPE)
-        || mediaType.equals(MediaType.TEXT_XML_TYPE)) {
-      this.format = mediaType;
-    } else {
-      throw new UnsupportedEncodingException("Encoding must be application/json or text/xml");
-    }
+  public Xrel() {
     this.clientId = Optional.empty();
   }
 
@@ -97,21 +72,11 @@ public class Xrel {
   /**
    * Constructs a new xREL object with oAuth information and no scopes.
    * 
-   * @param mediaType The {@link MediaType} to use. Must be either application/json or text/xml.
    * @param clientId Your consumer key.
    * @param clientSecret Your consumer secret.
-   * @throws UnsupportedEncodingException If the given encoding is neither application/json nor
-   *         application/xml.
    * @see <a href="https://www.xrel.to/wiki/6436/api-oauth2.html">API: OAuth 2.0</a>
    */
-  public Xrel(MediaType mediaType, String clientId, String clientSecret)
-      throws UnsupportedEncodingException {
-    if (mediaType.equals(MediaType.APPLICATION_JSON_TYPE)
-        || mediaType.equals(MediaType.TEXT_XML_TYPE)) {
-      this.format = mediaType;
-    } else {
-      throw new UnsupportedEncodingException("Encoding must be application/json or text/xml");
-    }
+  public Xrel(String clientId, String clientSecret) {
     this.clientId = Optional.of(clientId);
     this.clientSecret = Optional.of(clientSecret);
     this.redirectUri = Optional.empty();
@@ -122,25 +87,16 @@ public class Xrel {
   /**
    * Constructs a new xREL object with oAuth information and no scopes.
    * 
-   * @param mediaType The {@link MediaType} to use. Must be either application/json or text/xml.
    * @param clientId Your consumer key.
    * @param clientSecret Your consumer secret.
    * @param redirectUri Optional URI to redirect to after the authentication. Please read the Guide
    *        for more details.
    * @param state Optionally any string. You may set this value to any value, and it will be
    *        returned after the authentication. It might also be useful to prevent CSRF attacks.
-   * @throws UnsupportedEncodingException If the given encoding is neither application/json nor
-   *         application/xml.
    * @see <a href="https://www.xrel.to/wiki/6436/api-oauth2.html">API: OAuth 2.0</a>
    */
-  public Xrel(MediaType mediaType, String clientId, String clientSecret,
-      Optional<String> redirectUri, Optional<String> state) throws UnsupportedEncodingException {
-    if (mediaType.equals(MediaType.APPLICATION_JSON_TYPE)
-        || mediaType.equals(MediaType.TEXT_XML_TYPE)) {
-      this.format = mediaType;
-    } else {
-      throw new UnsupportedEncodingException("Encoding must be application/json or text/xml");
-    }
+  public Xrel(String clientId, String clientSecret, Optional<String> redirectUri,
+      Optional<String> state) {
     this.clientId = Optional.of(clientId);
     this.clientSecret = Optional.of(clientSecret);
     this.redirectUri = redirectUri;
@@ -150,26 +106,16 @@ public class Xrel {
 
   /**
    * Constructs a new xREL object. If you have oAuth access but no additional scopes you should use
-   * {@link #Xrel(MediaType, String, String, Optional, Optional)}.
+   * {@link #Xrel(String, String, Optional, Optional)}.
    * 
-   * @param mediaType The {@link MediaType} to use. Must be either application/json or text/xml.
    * @param clientId Your consumer key.
    * @param clientSecret Your consumer secret.
    * @param scope Needed to access protected methods. If you do have scope access: you MUST supply
    *        these while processing the Tokens, even if you only plan to use them at a later stage.
    *        Rule of thumb: if you have these, always add them here.
-   * @throws UnsupportedEncodingException If the given encoding is neither application/json nor
-   *         application/xml.
    * @see <a href="https://www.xrel.to/wiki/6436/api-oauth2.html">API: OAuth 2.0</a>
    */
-  public Xrel(MediaType mediaType, String clientId, String clientSecret, String[] scope)
-      throws UnsupportedEncodingException {
-    if (mediaType.equals(MediaType.APPLICATION_JSON_TYPE)
-        || mediaType.equals(MediaType.TEXT_XML_TYPE)) {
-      this.format = mediaType;
-    } else {
-      throw new UnsupportedEncodingException("Encoding must be application/json or text/xml");
-    }
+  public Xrel(String clientId, String clientSecret, String[] scope) {
     this.clientId = Optional.of(clientId);
     this.clientSecret = Optional.of(clientSecret);
     this.redirectUri = Optional.empty();
@@ -179,9 +125,8 @@ public class Xrel {
 
   /**
    * Constructs a new xREL object. If you have oAuth access but no additional scopes you should use
-   * {@link #Xrel(MediaType, String, String, Optional, Optional)}.
+   * {@link #Xrel(String, String, Optional, Optional)}.
    * 
-   * @param mediaType The {@link MediaType} to use. Must be either application/json or text/xml.
    * @param clientId Your consumer key.
    * @param clientSecret Your consumer secret.
    * @param redirectUri Optional URI to redirect to after the authentication. Please read the Guide
@@ -191,43 +136,15 @@ public class Xrel {
    * @param scope Needed to access protected methods. If you do have scope access: you MUST supply
    *        these while processing the Tokens, even if you only plan to use them at a later stage.
    *        Rule of thumb: if you have these, always add them here.
-   * @throws UnsupportedEncodingException If the given encoding is neither application/json nor
-   *         application/xml.
    * @see <a href="https://www.xrel.to/wiki/6436/api-oauth2.html">API: OAuth 2.0</a>
    */
-  public Xrel(MediaType mediaType, String clientId, String clientSecret,
-      Optional<String> redirectUri, Optional<String> state, String[] scope)
-      throws UnsupportedEncodingException {
-    if (mediaType.equals(MediaType.APPLICATION_JSON_TYPE)
-        || mediaType.equals(MediaType.TEXT_XML_TYPE)) {
-      this.format = mediaType;
-    } else {
-      throw new UnsupportedEncodingException("Encoding must be application/json or text/xml");
-    }
+  public Xrel(String clientId, String clientSecret, Optional<String> redirectUri,
+      Optional<String> state, String[] scope) {
     this.clientId = Optional.of(clientId);
     this.clientSecret = Optional.of(clientSecret);
     this.redirectUri = redirectUri;
     this.state = state;
     this.scope = Optional.of(scope);
-  }
-
-
-  /**
-   * Gets the xREL base URL.
-   * 
-   * @return The xREL URL
-   */
-  private String getXrelUrl() {
-    return xrelUrl;
-  }
-
-  /**
-   * Gets the format of the wanted response.
-   * 
-   * @return The format of the response
-   */
-  private MediaType getFormat() {
-    return format;
   }
 
   /**
@@ -328,46 +245,6 @@ public class Xrel {
   }
 
   /**
-   * Handles a {@link Response} by the API. This is used, so custom error handling can be
-   * implemented.
-   * 
-   * @param <T> The type of the returned object you normally expect to get from the API
-   * @param genericType The {@link GenericType} the {@link Response} should normally wrap
-   * @param response The given {@link Response}
-   * @return The read object or {@code null} if the response is not expected to return anything
-   *         (201, 204, ...)
-   * @throws XrelException If there is an error returned by the xREL API
-   */
-  private <T> T handleResponse(GenericType<T> genericType, Response response) throws XrelException {
-    if (response.getStatus() == Status.OK.getStatusCode()) {
-      // If we have an OK response, we can just read it
-      return response.readEntity(genericType);
-    } else if (response.getStatus() == Status.ACCEPTED.getStatusCode()
-        || response.getStatus() == Status.NO_CONTENT.getStatusCode()
-        || response.getStatus() == Status.CREATED.getStatusCode()) {
-      // Some codes are OK but have no content
-      return null;
-    } else {
-      // Otherwise we have an error
-      if (response.hasEntity()) {
-        // If we have some content, this should be an xREL API error object
-        try {
-          Error error = response.readEntity(Error.class);
-          throw new XrelException(error.getErrorDescription(), error, response.getStatus());
-        } catch (ProcessingException e) {
-          // If we can't unmarshal to an Error object we can only use the HTTP status code and the
-          // ProcessingException
-          // Generally this should not happen and if it does it is an error in the xREL API
-          throw new XrelException(e, response.getStatus());
-        }
-      } else {
-        // If we we have no content we can only use the HTTP status code
-        throw new XrelException(response.getStatus());
-      }
-    }
-  }
-
-  /**
    * Gets the maximum number of requests that the consumer is permitted to make per hour as returned
    * by the last request. -1 if not yet set.
    * 
@@ -375,7 +252,7 @@ public class Xrel {
    * @see <a href="https://www.xrel.to/wiki/2727/api-rate-limiting.html">API: Rate Limiting</a>
    */
   public int getXRateLimitLimit() {
-    return RateLimitFilter.getXRateLimitLimit();
+    return ResponseInterceptor.getXRateLimitLimit();
   }
 
   /**
@@ -386,7 +263,7 @@ public class Xrel {
    * @see <a href="https://www.xrel.to/wiki/2727/api-rate-limiting.html">API: Rate Limiting</a>
    */
   public int getXRateLimitRemaining() {
-    return RateLimitFilter.getXRateLimitRemaining();
+    return ResponseInterceptor.getXRateLimitRemaining();
   }
 
   /**
@@ -397,7 +274,7 @@ public class Xrel {
    * @see <a href="https://www.xrel.to/wiki/2727/api-rate-limiting.html">API: Rate Limiting</a>
    */
   public int getXRateLimitReset() {
-    return RateLimitFilter.getXRateLimitReset();
+    return ResponseInterceptor.getXRateLimitReset();
   }
 
   /**
@@ -417,89 +294,6 @@ public class Xrel {
   }
 
   /**
-   * Creates the base {@link WebTarget} to be used for every request on the xREL API. This already
-   * sets the complete URL with the specified path and the format to be used for the request.
-   * 
-   * @param path The path to use
-   * @return The constructed {@link WebTarget}
-   */
-  private WebTarget createBaseWebTarget(String path) {
-    final Client client = ClientBuilder.newClient();
-    client.register(RateLimitFilter.class);
-    client.register(CompressionHelper.class);
-    WebTarget webTarget = client.target(getXrelUrl());
-    return webTarget.path(path + "." + getFormat().getSubtype());
-  }
-
-  /**
-   * Changes the name of an {@link XmlRootElement} annotation of a given class. This is used,
-   * because in XML we have root elements that we need to map, while in JSON this is not present.
-   * This is used as a workaround and uses Java internals that can possibly break on any new Java
-   * version.
-   * 
-   * @param clazz The class to alter
-   * @param name The name of the root element
-   * @throws XrelException
-   */
-  private void changeXmlRootName(@SuppressWarnings("rawtypes") Class clazz, String name)
-      throws XrelException {
-    // If we are not using XML we do not have to alter anything
-    if (!getFormat().equals(MediaType.TEXT_XML_TYPE)) {
-      return;
-    }
-
-    // Get the already present XmlRootElement annotation
-    Annotation annotation = null;
-    for (Annotation currentAnnotation : clazz.getAnnotations()) {
-      if (currentAnnotation.annotationType().isAssignableFrom(XmlRootElement.class)) {
-        annotation = currentAnnotation;
-        break;
-      }
-    }
-    if (annotation == null) {
-      throw new IllegalArgumentException("Given class has no XmlRootElement");
-    }
-
-    // Construct the new Annotation
-    final XmlRootElement xmlRootElement = (XmlRootElement) annotation;
-    Annotation newAnnotation = new XmlRootElement() {
-      @Override
-      public Class<? extends Annotation> annotationType() {
-        return xmlRootElement.annotationType();
-      }
-
-      @Override
-      public String namespace() {
-        return xmlRootElement.namespace();
-      }
-
-      @Override
-      public String name() {
-        return name;
-      }
-    };
-
-    try {
-      // Reflection to get the private method
-      Method method = Class.class.getDeclaredMethod("annotationData");
-      method.setAccessible(true);
-      Object annotationData = method.invoke(clazz);
-
-      // Get the present annotations
-      Field annotations = annotationData.getClass().getDeclaredField("annotations");
-      annotations.setAccessible(true);
-      @SuppressWarnings("unchecked")
-      Map<Class<? extends Annotation>, Annotation> annotationDataMap =
-          (Map<Class<? extends Annotation>, Annotation>) annotations.get(annotationData);
-
-      // Set the new annotation
-      annotationDataMap.put(XmlRootElement.class, newAnnotation);
-    } catch (Exception e) {
-      throw new XrelException(e);
-    }
-  }
-
-  /**
    * Returns information about a single release, specified by the complete dirname or an API release
    * id.
    * 
@@ -513,15 +307,20 @@ public class Xrel {
   private Release getReleaseInfo(String idDir, boolean useId) throws XrelException {
     Objects.requireNonNull(idDir, "idDir missing");
 
-    WebTarget webTarget = createBaseWebTarget("release/info");
+    XrelService xrelService = RestClient.getInstance().getXrelService();
+    Call<Release> call = null;
     if (useId) {
-      webTarget = webTarget.queryParam("id", idDir);
+      call = xrelService.releaseInfo(idDir, null);
     } else {
-      webTarget = webTarget.queryParam("dirname", idDir);
+      call = xrelService.releaseInfo(null, idDir);
     }
-    Invocation.Builder invocationBuilder = webTarget.request(getFormat());
-    Response response = invocationBuilder.get();
-    Release release = handleResponse(new GenericType<Release>() {}, response);
+    Response<Release> response = null;
+    try {
+      response = call.execute();
+    } catch (Exception e) {
+      throw new XrelException(e);
+    }
+    Release release = response.body();
 
     return release;
   }
@@ -574,31 +373,27 @@ public class Xrel {
       Filter filter, Token token) throws XrelException {
     int[] normalizedPageValues = normalizePageValues(perPage, page);
 
-    WebTarget webTarget = createBaseWebTarget("release/latest");
-    webTarget = webTarget.queryParam("per_page", normalizedPageValues[0]);
-    webTarget = webTarget.queryParam("page", normalizedPageValues[1]);
-    if (archive != null) {
-      webTarget = webTarget.queryParam("archive", archive);
-    }
+    String filterParam = null;
     if (filter != null && token == null) {
-      webTarget = webTarget.queryParam("filter", filter.getId());
+      filterParam = String.valueOf(filter.getId());
     }
     if (filter == null && token != null) {
-      webTarget = webTarget.queryParam("filter", "overview");
+      filterParam = "overview";
     }
-
-    Invocation.Builder invocationBuilder = webTarget.request(getFormat());
+    String bearerToken = null;
     if (token != null) {
-      invocationBuilder.header(HttpHeaders.AUTHORIZATION, "Bearer " + token.getAccessToken());
+      bearerToken = token.createBearerHeader();
     }
+    Call<PaginationList<Release>> call = RestClient.getInstance().getXrelService().releaseLatest(
+        bearerToken, normalizedPageValues[0], normalizedPageValues[1], archive, filterParam);
 
-    Response response = invocationBuilder.get();
-    changeXmlRootName(PaginationList.class, "releases");
-    PaginationList<Release> releaseList =
-        handleResponse(new GenericType<PaginationList<Release>>() {}, response);
-    changeXmlRootName(PaginationList.class, "##default");
-
-    return releaseList;
+    Response<PaginationList<Release>> response = null;
+    try {
+      response = call.execute();
+    } catch (Exception e) {
+      throw new XrelException(e);
+    }
+    return response.body();
   }
 
   /**
@@ -757,13 +552,17 @@ public class Xrel {
    *      release/categories method</a>
    */
   public Set<ReleaseCategory> getReleaseCategories() throws XrelException {
-    WebTarget webTarget = createBaseWebTarget("release/categories");
-    Invocation.Builder invocationBuilder = webTarget.request(getFormat());
-    Response response = invocationBuilder.get();
-    Set<ReleaseCategory> categorySet =
-        handleResponse(new GenericType<Set<ReleaseCategory>>() {}, response);
+    Call<Set<ReleaseCategory>> call = RestClient.getInstance().getXrelService().releaseCategories();
 
-    // We put all categories we found into a map, so we can calculate the parrent
+    Response<Set<ReleaseCategory>> response = null;
+    try {
+      response = call.execute();
+    } catch (Exception e) {
+      throw new XrelException(e);
+    }
+    Set<ReleaseCategory> categorySet = response.body();
+
+    // We put all categories we found into a map, so we can calculate the parent
     // categories
     Map<String, ReleaseCategory> hashMap = new HashMap<String, ReleaseCategory>();
     for (ReleaseCategory releaseCategory : categorySet) {
@@ -792,21 +591,16 @@ public class Xrel {
       String extInfoType, int perPage, int page) throws XrelException {
     int[] normalizedPageValues = normalizePageValues(perPage, page);
 
-    WebTarget webTarget = createBaseWebTarget("release/browse_category");
-    webTarget = webTarget.queryParam("category_name", category.getName());
-
-    if (extInfoType != null) {
-      webTarget = webTarget.queryParam("ext_info_type", extInfoType);
+    Call<PaginationList<Release>> call =
+        RestClient.getInstance().getXrelService().releaseBrowseCategory(category.getName(),
+            extInfoType, normalizedPageValues[0], normalizedPageValues[1]);
+    Response<PaginationList<Release>> response = null;
+    try {
+      response = call.execute();
+    } catch (Exception e) {
+      throw new XrelException(e);
     }
-    webTarget = webTarget.queryParam("per_page", normalizedPageValues[0]);
-    webTarget = webTarget.queryParam("page", normalizedPageValues[1]);
-
-    Invocation.Builder invocationBuilder = webTarget.request(getFormat());
-    Response response = invocationBuilder.get();
-    changeXmlRootName(PaginationList.class, "releases");
-    PaginationList<Release> releaseList =
-        handleResponse(new GenericType<PaginationList<Release>>() {}, response);
-    changeXmlRootName(PaginationList.class, "##default");
+    PaginationList<Release> releaseList = response.body();
 
     return releaseList;
   }
@@ -863,17 +657,15 @@ public class Xrel {
 
     int[] normalizedPageValues = normalizePageValues(perPage, page);
 
-    WebTarget webTarget = createBaseWebTarget("release/ext_info");
-    webTarget = webTarget.queryParam("id", extInfo.getId());
-    webTarget = webTarget.queryParam("per_page", normalizedPageValues[0]);
-    webTarget = webTarget.queryParam("page", normalizedPageValues[1]);
-
-    Invocation.Builder invocationBuilder = webTarget.request(getFormat());
-    Response response = invocationBuilder.get();
-    changeXmlRootName(PaginationList.class, "releases");
-    PaginationList<Release> releaseList =
-        handleResponse(new GenericType<PaginationList<Release>>() {}, response);
-    changeXmlRootName(PaginationList.class, "##default");
+    Call<PaginationList<Release>> call = RestClient.getInstance().getXrelService()
+        .releaseExtInfo(extInfo.getId(), normalizedPageValues[0], normalizedPageValues[1]);
+    Response<PaginationList<Release>> response = null;
+    try {
+      response = call.execute();
+    } catch (Exception e) {
+      throw new XrelException(e);
+    }
+    PaginationList<Release> releaseList = response.body();
 
     return releaseList;
   }
@@ -889,10 +681,14 @@ public class Xrel {
    *      method</a>
    */
   public Set<Filter> getReleaseFilters() throws XrelException {
-    WebTarget webTarget = createBaseWebTarget("release/filters");
-    Invocation.Builder invocationBuilder = webTarget.request(getFormat());
-    Response response = invocationBuilder.get();
-    Set<Filter> filterSet = handleResponse(new GenericType<Set<Filter>>() {}, response);
+    Call<Set<Filter>> call = RestClient.getInstance().getXrelService().releaseFilters();
+    Response<Set<Filter>> response = null;
+    try {
+      response = call.execute();
+    } catch (Exception e) {
+      throw new XrelException(e);
+    }
+    Set<Filter> filterSet = response.body();
 
     return filterSet;
   }
@@ -920,22 +716,20 @@ public class Xrel {
       throw new XrelException("addproof scope not provided");
     }
 
-    Form form = new Form();
-    if (releaseList.size() == 1) {
-      form.param("id", releaseList.get(0).getId());
-    } else {
-      for (Release release : releaseList) {
-        form.param("id[]", release.getId());
-      }
+    Set<String> ids = new HashSet<>();
+    for (Release release : releaseList) {
+      ids.add(release.getId());
     }
-    Entity<Form> entity = Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE);
 
-    WebTarget webTarget = createBaseWebTarget("release/addproof");
-    Invocation.Builder invocationBuilder = webTarget.request(getFormat());
-    invocationBuilder.header(HttpHeaders.AUTHORIZATION, "Bearer " + token.getAccessToken());
-    Response response = invocationBuilder.post(entity);
-    ReleaseAddProof releaseAddProof =
-        handleResponse(new GenericType<ReleaseAddProof>() {}, response);
+    Call<ReleaseAddProof> call = RestClient.getInstance().getXrelService()
+        .releaseAddproof(token.createBearerHeader(), ids, image);
+    Response<ReleaseAddProof> response = null;
+    try {
+      response = call.execute();
+    } catch (Exception e) {
+      throw new XrelException(e);
+    }
+    ReleaseAddProof releaseAddProof = response.body();
 
     return releaseAddProof;
   }
@@ -958,26 +752,27 @@ public class Xrel {
       P2pCategory p2pCategory, P2pGroup p2pGroup, ExtInfo extInfo) throws XrelException {
     int[] normalizedPageValues = normalizePageValues(perPage, page);
 
-    WebTarget webTarget = createBaseWebTarget("p2p/releases");
-    webTarget = webTarget.queryParam("per_page", normalizedPageValues[0]);
-    webTarget = webTarget.queryParam("page", normalizedPageValues[1]);
-
+    String categoryId = null;
     if (p2pCategory != null) {
-      webTarget = webTarget.queryParam("category_id", p2pCategory.getId());
+      categoryId = p2pCategory.getId();
     }
+    String groupId = null;
     if (p2pGroup != null) {
-      webTarget = webTarget.queryParam("group_id", p2pGroup.getId());
+      groupId = p2pGroup.getId();
     }
+    String extInfoId = null;
     if (extInfo != null) {
-      webTarget = webTarget.queryParam("ext_info_id", extInfo.getId());
+      extInfoId = extInfo.getId();
     }
-
-    Invocation.Builder invocationBuilder = webTarget.request(getFormat());
-    Response response = invocationBuilder.get();
-    changeXmlRootName(PaginationList.class, "p2p_releases");
-    PaginationList<P2pRelease> p2pList =
-        handleResponse(new GenericType<PaginationList<P2pRelease>>() {}, response);
-    changeXmlRootName(PaginationList.class, "##default");
+    Call<PaginationList<P2pRelease>> call = RestClient.getInstance().getXrelService().p2pReleases(
+        normalizedPageValues[0], normalizedPageValues[1], categoryId, groupId, extInfoId);
+    Response<PaginationList<P2pRelease>> response = null;
+    try {
+      response = call.execute();
+    } catch (Exception e) {
+      throw new XrelException(e);
+    }
+    PaginationList<P2pRelease> p2pList = response.body();
 
     return p2pList;
   }
@@ -1128,10 +923,14 @@ public class Xrel {
    * @see <a href= "https://www.xrel.to/wiki/3698/api-p2p-categories.html">API: p2p/categories</a>
    */
   public Set<P2pCategory> getP2pCategories() throws XrelException {
-    WebTarget webTarget = createBaseWebTarget("p2p/categories");
-    Invocation.Builder invocationBuilder = webTarget.request(getFormat());
-    Response response = invocationBuilder.get();
-    Set<P2pCategory> p2pSet = handleResponse(new GenericType<Set<P2pCategory>>() {}, response);
+    Call<Set<P2pCategory>> call = RestClient.getInstance().getXrelService().p2pCategories();
+    Response<Set<P2pCategory>> response = null;
+    try {
+      response = call.execute();
+    } catch (Exception e) {
+      throw new XrelException(e);
+    }
+    Set<P2pCategory> p2pSet = response.body();
 
     return p2pSet;
   }
@@ -1150,16 +949,20 @@ public class Xrel {
   private P2pRelease getP2pRlsInfo(String idDir, boolean useId) throws XrelException {
     Objects.requireNonNull(idDir, "idDir missing");
 
-    WebTarget webTarget = createBaseWebTarget("p2p/rls_info");
+    Call<P2pRelease> call = null;
     if (useId) {
-      webTarget = webTarget.queryParam("id", idDir);
+      call = RestClient.getInstance().getXrelService().p2pRlsInfo(idDir, null);
     } else {
-      webTarget = webTarget.queryParam("dirname", idDir);
+      call = RestClient.getInstance().getXrelService().p2pRlsInfo(null, idDir);
     }
 
-    Invocation.Builder invocationBuilder = webTarget.request(getFormat());
-    Response response = invocationBuilder.get();
-    P2pRelease p2pRelease = handleResponse(new GenericType<P2pRelease>() {}, response);
+    Response<P2pRelease> response = null;
+    try {
+      response = call.execute();
+    } catch (Exception e) {
+      throw new XrelException(e);
+    }
+    P2pRelease p2pRelease = response.body();
 
     return p2pRelease;
   }
@@ -1209,12 +1012,15 @@ public class Xrel {
       throw new XrelException("viewnfo scope not provided");
     }
 
-    WebTarget webTarget = createBaseWebTarget("nfo/release");
-    webTarget = webTarget.queryParam("id", release.getId());
-    Invocation.Builder invocationBuilder = webTarget.request("image/png");
-    invocationBuilder.header(HttpHeaders.AUTHORIZATION, "Bearer " + token.getAccessToken());
-    Response response = invocationBuilder.get();
-    byte[] nfo = handleResponse(new GenericType<byte[]>() {}, response);
+    Call<ResponseBody> call = RestClient.getInstance().getXrelService()
+        .nfoRelease(token.createBearerHeader(), release.getId());
+    byte[] nfo = null;
+    try {
+      Response<ResponseBody> response = call.execute();
+      nfo = response.body().bytes();
+    } catch (Exception e) {
+      throw new XrelException(e);
+    }
 
     return nfo;
   }
@@ -1236,12 +1042,15 @@ public class Xrel {
       throw new XrelException("viewnfo scope not provided");
     }
 
-    WebTarget webTarget = createBaseWebTarget("nfo/p2p_rls");
-    webTarget = webTarget.queryParam("id", p2pRelease.getId());
-    Invocation.Builder invocationBuilder = webTarget.request("image/png");
-    invocationBuilder.header(HttpHeaders.AUTHORIZATION, "Bearer " + token.getAccessToken());
-    Response response = invocationBuilder.get();
-    byte[] nfo = handleResponse(new GenericType<byte[]>() {}, response);
+    Call<ResponseBody> call = RestClient.getInstance().getXrelService()
+        .nfoP2pRelease(token.createBearerHeader(), p2pRelease.getId());
+    byte[] nfo = null;
+    try {
+      Response<ResponseBody> response = call.execute();
+      nfo = response.body().bytes();
+    } catch (Exception e) {
+      throw new XrelException(e);
+    }
 
     return nfo;
   }
@@ -1260,15 +1069,17 @@ public class Xrel {
     Objects.requireNonNull(country, "country missing");
 
     if (!country.equals("de") && !country.equals("us")) {
-      throw new XrelException("country must be either de or en");
+      throw new XrelException("country must be either de or us");
     }
 
-    WebTarget webTarget = createBaseWebTarget("calendar/upcoming");
-    webTarget = webTarget.queryParam("country", country);
-    Invocation.Builder invocationBuilder = webTarget.request(getFormat());
-    Response response = invocationBuilder.get();
-    List<ExtInfo> upcomingList = handleResponse(new GenericType<List<ExtInfo>>() {}, response);
-
+    Call<List<ExtInfo>> call = RestClient.getInstance().getXrelService().calendarUpcoming(country);
+    Response<List<ExtInfo>> response = null;
+    try {
+      response = call.execute();
+    } catch (Exception e) {
+      throw new XrelException(e);
+    }
+    List<ExtInfo> upcomingList = response.body();
     return upcomingList;
   }
 
@@ -1286,14 +1097,19 @@ public class Xrel {
   private ExtInfo getExtInfoInfoPrivate(ExtInfo extInfo, Token token) throws XrelException {
     Objects.requireNonNull(extInfo, "extInfo missing");
 
-    WebTarget webTarget = createBaseWebTarget("ext_info/info");
-    webTarget = webTarget.queryParam("id", extInfo.getId());
-    Invocation.Builder invocationBuilder = webTarget.request(getFormat());
+    String authorization = null;
     if (token != null) {
-      invocationBuilder.header(HttpHeaders.AUTHORIZATION, "Bearer " + token.getAccessToken());
+      authorization = token.createBearerHeader();
     }
-    Response response = invocationBuilder.get();
-    ExtInfo extInfoNew = handleResponse(new GenericType<ExtInfo>() {}, response);
+    Call<ExtInfo> call =
+        RestClient.getInstance().getXrelService().extInfoInfo(authorization, extInfo.getId());
+    Response<ExtInfo> response = null;
+    try {
+      response = call.execute();
+    } catch (Exception e) {
+      throw new XrelException(e);
+    }
+    ExtInfo extInfoNew = response.body();
 
     return extInfoNew;
   }
@@ -1343,12 +1159,15 @@ public class Xrel {
   public void getExtInfoMedia(ExtInfo extInfo) throws XrelException {
     Objects.requireNonNull(extInfo, "extInfo missing");
 
-    WebTarget webTarget = createBaseWebTarget("ext_info/media");
-    webTarget = webTarget.queryParam("id", extInfo.getId());
-    Invocation.Builder invocationBuilder = webTarget.request(getFormat());
-    Response response = invocationBuilder.get();
-    List<ExtInfoMedia> extInfoMediaList =
-        handleResponse(new GenericType<List<ExtInfoMedia>>() {}, response);
+    Call<List<ExtInfoMedia>> call =
+        RestClient.getInstance().getXrelService().extInfoMedia(extInfo.getId());
+    Response<List<ExtInfoMedia>> response = null;
+    try {
+      response = call.execute();
+    } catch (Exception e) {
+      throw new XrelException(e);
+    }
+    List<ExtInfoMedia> extInfoMediaList = response.body();
 
     if (extInfo.getExtInfoMedia() != null) {
       extInfo.getExtInfoMedia().clear();
@@ -1377,16 +1196,16 @@ public class Xrel {
       throw new XrelException("rating must be in the range of 1 - 10");
     }
 
-    Form form = new Form();
-    form.param("id", extInfo.getId());
-    form.param("rating", String.valueOf(rating));
-    Entity<Form> entity = Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE);
+    Call<ExtInfo> call = RestClient.getInstance().getXrelService()
+        .extInfoRate(token.createBearerHeader(), extInfo.getId(), rating);
+    Response<ExtInfo> response = null;
+    try {
+      response = call.execute();
+    } catch (Exception e) {
+      throw new XrelException(e);
+    }
+    ExtInfo extInfoRated = response.body();
 
-    WebTarget webTarget = createBaseWebTarget("ext_info/rate");
-    Invocation.Builder invocationBuilder = webTarget.request(getFormat());
-    invocationBuilder.header(HttpHeaders.AUTHORIZATION, "Bearer " + token.getAccessToken());
-    Response response = invocationBuilder.post(entity);
-    ExtInfo extInfoRated = handleResponse(new GenericType<ExtInfo>() {}, response);
     extInfo.setOwnRating(extInfoRated.getOwnRating());
   }
 
@@ -1405,29 +1224,25 @@ public class Xrel {
    *      method</a>
    */
   private ReleaseSearchResult getSearchReleasesPrivate(String q, boolean scene, boolean p2p,
-      int limit) throws XrelException {
+      Integer limit) throws XrelException {
     Objects.requireNonNull(q, "q missing");
 
     if ((!p2p) && (!scene)) {
       throw new XrelException("either scene or p2p must be set to true");
     }
-    if (limit != -1) {
-      if (limit < 1) {
-        throw new XrelException("limit must be either -1 or greater than 1");
-      }
+    if (limit != null && limit < 1) {
+      throw new XrelException("limit must be either null or greater than 1");
     }
 
-    WebTarget webTarget = createBaseWebTarget("search/releases");
-    webTarget = webTarget.queryParam("q", q);
-    webTarget = webTarget.queryParam("scene", scene);
-    webTarget = webTarget.queryParam("p2p", p2p);
-    if (limit != -1) {
-      webTarget = webTarget.queryParam("limit", limit);
+    Call<ReleaseSearchResult> call =
+        RestClient.getInstance().getXrelService().searchReleases(q, scene, p2p, limit);
+    Response<ReleaseSearchResult> response = null;
+    try {
+      response = call.execute();
+    } catch (Exception e) {
+      throw new XrelException(e);
     }
-    Invocation.Builder invocationBuilder = webTarget.request(getFormat());
-    Response response = invocationBuilder.get();
-    ReleaseSearchResult releaseSearchResult =
-        handleResponse(new GenericType<ReleaseSearchResult>() {}, response);
+    ReleaseSearchResult releaseSearchResult = response.body();
 
     return releaseSearchResult;
   }
@@ -1453,9 +1268,11 @@ public class Xrel {
     if ((!p2p) && (!scene)) {
       throw new XrelException("either scene or p2p must be set to true");
     }
+
     if (limit < 1) {
       throw new XrelException("limit must be 1 or greater");
     }
+
     return getSearchReleasesPrivate(q, scene, p2p, limit);
   }
 
@@ -1480,7 +1297,7 @@ public class Xrel {
       throw new XrelException("either scene or p2p must be set to true");
     }
 
-    return getSearchReleasesPrivate(q, scene, p2p, -1);
+    return getSearchReleasesPrivate(q, scene, p2p, null);
   }
 
   /**
@@ -1497,28 +1314,23 @@ public class Xrel {
    * @see <a href= "https://www.xrel.to/wiki/6319/api-search-ext-info.html">API: search/ext_info
    *      method</a>
    */
-  private ExtInfoSearchResult getSearchExtInfoPrivate(String q, String type, int limit)
+  private ExtInfoSearchResult getSearchExtInfoPrivate(String q, String type, Integer limit)
       throws XrelException {
     Objects.requireNonNull(q, "q missing");
 
-    if (limit != -1) {
-      if (limit < 1) {
-        throw new XrelException("limit must be either -1 or greater than 1");
-      }
+    if (limit != null && limit < 1) {
+      throw new XrelException("limit must be either -1 or greater than 1");
     }
 
-    WebTarget webTarget = createBaseWebTarget("search/ext_info");
-    webTarget = webTarget.queryParam("q", q);
-    if (type != null && !type.isEmpty()) {
-      webTarget = webTarget.queryParam("type", type);
+    Call<ExtInfoSearchResult> call =
+        RestClient.getInstance().getXrelService().searchExtInfo(q, type, limit);
+    Response<ExtInfoSearchResult> response = null;
+    try {
+      response = call.execute();
+    } catch (Exception e) {
+      throw new XrelException(e);
     }
-    if (limit != -1) {
-      webTarget = webTarget.queryParam("limit", limit);
-    }
-    Invocation.Builder invocationBuilder = webTarget.request(getFormat());
-    Response response = invocationBuilder.get();
-    ExtInfoSearchResult extInfoSearchResult =
-        handleResponse(new GenericType<ExtInfoSearchResult>() {}, response);
+    ExtInfoSearchResult extInfoSearchResult = response.body();
 
     return extInfoSearchResult;
   }
@@ -1537,7 +1349,7 @@ public class Xrel {
   public ExtInfoSearchResult getSearchExtInfo(String q) throws XrelException {
     Objects.requireNonNull(q, "q missing");
 
-    return getSearchExtInfoPrivate(q, null, -1);
+    return getSearchExtInfoPrivate(q, null, null);
   }
 
   /**
@@ -1579,7 +1391,7 @@ public class Xrel {
     Objects.requireNonNull(q, "q missing");
     Objects.requireNonNull(type, "type missing");
 
-    return getSearchExtInfoPrivate(q, type, -1);
+    return getSearchExtInfoPrivate(q, type, null);
   }
 
   /**
@@ -1619,11 +1431,15 @@ public class Xrel {
   public List<Favorite> getFavsLists(Token token) throws XrelException {
     Objects.requireNonNull(token, "token missing");
 
-    WebTarget webTarget = createBaseWebTarget("favs/lists");
-    Invocation.Builder invocationBuilder = webTarget.request(getFormat());
-    invocationBuilder.header(HttpHeaders.AUTHORIZATION, "Bearer " + token.getAccessToken());
-    Response response = invocationBuilder.get();
-    List<Favorite> favoriteList = handleResponse(new GenericType<List<Favorite>>() {}, response);
+    Call<List<Favorite>> call =
+        RestClient.getInstance().getXrelService().favsLists(token.createBearerHeader());
+    Response<List<Favorite>> response = null;
+    try {
+      response = call.execute();
+    } catch (Exception e) {
+      throw new XrelException(e);
+    }
+    List<Favorite> favoriteList = response.body();
 
     return favoriteList;
   }
@@ -1645,13 +1461,15 @@ public class Xrel {
     Objects.requireNonNull(favorite, "favorite missing");
     Objects.requireNonNull(token, "token missing");
 
-    WebTarget webTarget = createBaseWebTarget("favs/list_entries");
-    webTarget = webTarget.queryParam("id", favorite.getId());
-    webTarget = webTarget.queryParam("get_releases", getReleases);
-    Invocation.Builder invocationBuilder = webTarget.request(getFormat());
-    invocationBuilder.header(HttpHeaders.AUTHORIZATION, "Bearer " + token.getAccessToken());
-    Response response = invocationBuilder.get();
-    List<ExtInfo> extInfoList = handleResponse(new GenericType<List<ExtInfo>>() {}, response);
+    Call<List<ExtInfo>> call = RestClient.getInstance().getXrelService()
+        .favsListEntries(token.createBearerHeader(), favorite.getId(), getReleases);
+    Response<List<ExtInfo>> response = null;
+    try {
+      response = call.execute();
+    } catch (Exception e) {
+      throw new XrelException(e);
+    }
+    List<ExtInfo> extInfoList = response.body();
 
     if (favorite.getEntries() != null) {
       favorite.getEntries().clear();
@@ -1682,28 +1500,21 @@ public class Xrel {
     Objects.requireNonNull(extInfo, "extInfo missing");
     Objects.requireNonNull(token, "token missing");
 
-    Form form = new Form();
-    form.param("id", String.valueOf(favorite.getId()));
-    form.param("ext_info_id", String.valueOf(extInfo.getId()));
-    Entity<Form> entity = Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE);
-
-    WebTarget webTarget;
+    Call<FavoriteAddDelEntry> call = null;
     if (delete) {
-      webTarget = createBaseWebTarget("favs/list_delentry");
+      call = RestClient.getInstance().getXrelService().favsListDelEntry(token.createBearerHeader(),
+          favorite.getId(), extInfo.getId());
     } else {
-      webTarget = createBaseWebTarget("favs/list_addentry");
+      call = RestClient.getInstance().getXrelService().favsListDelEntry(token.createBearerHeader(),
+          favorite.getId(), extInfo.getId());
     }
-    Invocation.Builder invocationBuilder = webTarget.request(getFormat());
-    invocationBuilder.header(HttpHeaders.AUTHORIZATION, "Bearer " + token.getAccessToken());
-    Response response = invocationBuilder.post(entity);
-    if (delete) {
-      changeXmlRootName(FavoriteAddDelEntry.class, "fav_list_delentry");
-    } else {
-      changeXmlRootName(FavoriteAddDelEntry.class, "fav_list_addentry");
+    Response<FavoriteAddDelEntry> response = null;
+    try {
+      response = call.execute();
+    } catch (Exception e) {
+      throw new XrelException(e);
     }
-    FavoriteAddDelEntry favoriteAddDelEntry =
-        handleResponse(new GenericType<FavoriteAddDelEntry>() {}, response);
-    changeXmlRootName(FavoriteAddDelEntry.class, "##default");
+    FavoriteAddDelEntry favoriteAddDelEntry = response.body();
 
     return favoriteAddDelEntry;
   }
@@ -1775,18 +1586,15 @@ public class Xrel {
       type = "p2p_rls";
     }
 
-    Form form = new Form();
-    form.param("id", String.valueOf(favorite.getId()));
-    form.param("release_id", String.valueOf(releaseId));
-    form.param("type", type);
-    Entity<Form> entity = Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE);
-
-    WebTarget webTarget = createBaseWebTarget("favs/list_markread");
-    Invocation.Builder invocationBuilder = webTarget.request(getFormat());
-    invocationBuilder.header(HttpHeaders.AUTHORIZATION, "Bearer " + token.getAccessToken());
-    Response response = invocationBuilder.post(entity);
-    FavoriteMarkRead favoriteMarkRead =
-        handleResponse(new GenericType<FavoriteMarkRead>() {}, response);
+    Call<FavoriteMarkRead> call = RestClient.getInstance().getXrelService()
+        .favsListMarkread(token.createBearerHeader(), favorite.getId(), releaseId, type);
+    Response<FavoriteMarkRead> response = null;
+    try {
+      response = call.execute();
+    } catch (Exception e) {
+      throw new XrelException(e);
+    }
+    FavoriteMarkRead favoriteMarkRead = response.body();
 
     return favoriteMarkRead;
   }
@@ -1847,22 +1655,25 @@ public class Xrel {
       int perPage, int page) throws XrelException {
     int[] normalizedPageValues = normalizePageValues(perPage, page);
 
-    WebTarget webTarget = createBaseWebTarget("comments/get");
+    String id = null;
+    String type = null;
     if (release != null) {
-      webTarget = webTarget.queryParam("id", release.getId());
-      webTarget = webTarget.queryParam("type", "release");
+      id = release.getId();
+      type = "release";
     } else {
-      webTarget = webTarget.queryParam("id", p2pRelease.getId());
-      webTarget = webTarget.queryParam("type", "p2p_rls");
+      id = p2pRelease.getId();
+      type = "p2p_rls";
     }
-    webTarget = webTarget.queryParam("per_page", normalizedPageValues[0]);
-    webTarget = webTarget.queryParam("page", normalizedPageValues[1]);
-    Invocation.Builder invocationBuilder = webTarget.request(getFormat());
-    Response response = invocationBuilder.get();
-    changeXmlRootName(PaginationList.class, "comments");
-    PaginationList<Comment> commentList =
-        handleResponse(new GenericType<PaginationList<Comment>>() {}, response);
-    changeXmlRootName(PaginationList.class, "##default");
+
+    Call<PaginationList<Comment>> call = RestClient.getInstance().getXrelService().commentsGet(id,
+        type, normalizedPageValues[0], normalizedPageValues[1]);
+    Response<PaginationList<Comment>> response = null;
+    try {
+      response = call.execute();
+    } catch (Exception e) {
+      throw new XrelException(e);
+    }
+    PaginationList<Comment> commentList = response.body();
 
     return commentList;
   }
@@ -1913,10 +1724,10 @@ public class Xrel {
    *        videoRating and audioRating are set.
    * @param videoRating Video rating between 1 (bad) to 10 (good). You must always rate both or
    *        none. You may only vote once, and may not change your vote. Check the vote property from
-   *        the response to get the rating as displayed on the website. Use {@code -1} to disable.
+   *        the response to get the rating as displayed on the website. Use {@code null} to disable.
    * @param audioRating Audio rating between 1 (bad) to 10 (good). You must always rate both or
    *        none. You may only vote once, and may not change your vote. Check the vote property from
-   *        the response to get the rating as displayed on the website. Use {@code -1} to disable.
+   *        the response to get the rating as displayed on the website. Use {@code null} to disable.
    * @param token The {@link Token} with all needed info.
    * @return The added {@link Comment}
    * @throws XrelException If there is an error returned by the xREL API
@@ -1924,31 +1735,28 @@ public class Xrel {
    *      method</a>
    */
   private Comment postCommentsAdd(Release release, P2pRelease p2pRelease, String text,
-      int videoRating, int audioRating, Token token) throws XrelException {
+      Integer videoRating, Integer audioRating, Token token) throws XrelException {
     Objects.requireNonNull(token, "token missing");
 
-    Form form = new Form();
+    String id = null;
+    String type = null;
     if (release != null) {
-      form.param("id", release.getId());
-      form.param("type", "release");
+      id = release.getId();
+      type = "release";
     } else {
-      form.param("id", p2pRelease.getId());
-      form.param("type", "p2p_rls");
+      id = p2pRelease.getId();
+      type = "p2p_rls";
     }
-    if (videoRating != -1 && audioRating != -1) {
-      form.param("video_rating", String.valueOf(videoRating));
-      form.param("audio_rating", String.valueOf(audioRating));
-    }
-    if (text != null) {
-      form.param("text", text);
-    }
-    Entity<Form> entity = Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE);
 
-    WebTarget webTarget = createBaseWebTarget("comments/add");
-    Invocation.Builder invocationBuilder = webTarget.request(getFormat());
-    invocationBuilder.header(HttpHeaders.AUTHORIZATION, "Bearer " + token.getAccessToken());
-    Response response = invocationBuilder.post(entity);
-    Comment comment = handleResponse(new GenericType<Comment>() {}, response);
+    Call<Comment> call = RestClient.getInstance().getXrelService()
+        .commentsAdd(token.createBearerHeader(), id, type, text, videoRating, audioRating);
+    Response<Comment> response = null;
+    try {
+      response = call.execute();
+    } catch (Exception e) {
+      throw new XrelException(e);
+    }
+    Comment comment = response.body();
 
     return comment;
   }
@@ -2000,7 +1808,7 @@ public class Xrel {
     Objects.requireNonNull(token, "token missing");
     Objects.requireNonNull(text, "text missing");
 
-    return postCommentsAdd(release, null, text, -1, -1, token);
+    return postCommentsAdd(release, null, text, null, null, token);
   }
 
   /**
@@ -2083,7 +1891,7 @@ public class Xrel {
     Objects.requireNonNull(token, "token missing");
     Objects.requireNonNull(text, "text missing");
 
-    return postCommentsAdd(null, p2pRelease, text, -1, -1, token);
+    return postCommentsAdd(null, p2pRelease, text, null, null, token);
   }
 
   /**
@@ -2129,11 +1937,15 @@ public class Xrel {
   public User getUserInfo(Token token) throws XrelException {
     Objects.requireNonNull(token, "token missing");
 
-    WebTarget webTarget = createBaseWebTarget("user/info");
-    Invocation.Builder invocationBuilder = webTarget.request(getFormat());
-    invocationBuilder.header(HttpHeaders.AUTHORIZATION, "Bearer " + token.getAccessToken());
-    Response response = invocationBuilder.get();
-    User user = handleResponse(new GenericType<User>() {}, response);
+    Call<User> call =
+        RestClient.getInstance().getXrelService().userInfo(token.createBearerHeader());
+    Response<User> response = null;
+    try {
+      response = call.execute();
+    } catch (Exception e) {
+      throw new XrelException(e);
+    }
+    User user = response.body();
 
     return user;
   }
@@ -2147,23 +1959,8 @@ public class Xrel {
    * @see <a href="https://www.xrel.to/wiki/6436/api-oauth2.html">API: OAuth 2.0</a>
    */
   public String getOauth2Auth() {
-    Client client = ClientBuilder.newClient();
-    WebTarget webTarget = client.target(getXrelUrl());
-    webTarget = webTarget.path("oauth2/auth");
-    webTarget = webTarget.queryParam("response_type", getResponseType());
-    webTarget = webTarget.queryParam("client_id", getClientId().get());
-    if (getRedirectUri().isPresent()) {
-      webTarget = webTarget.queryParam("redirect_uri", getRedirectUri().get());
-    }
-    if (getState().isPresent()) {
-      webTarget = webTarget.queryParam("state", getState().get());
-    }
-    if (getScope().isPresent() && getScope().get().length > 0) {
-      String scope = String.join(" ", getScope().get());
-      webTarget = webTarget.queryParam("scope", scope);
-    }
-
-    return webTarget.getUri().toString();
+    return RestClient.getInstance().getOAuth2Auth(getResponseType(), getClientId().get(),
+        getRedirectUri(), getState(), getScope());
   }
 
   /**
@@ -2172,7 +1969,7 @@ public class Xrel {
    * @param grantType {@code authorization_code} for User authentication, {@code client_credentials}
    *        for Application authentication, {@code refresh_token} for refreshing an access token
    * @param code When performing the {@code authorization_code} grant, you must specify the code
-   *        provided from {@code #getOauth2Auth()}
+   *        provided from {@link #getOauth2Auth()}
    * @param token The {@link Token} with all needed info if performing {@code refresh_token} or
    *        {@code null} otherwise
    * @return The new {@link Token}
@@ -2210,34 +2007,29 @@ public class Xrel {
       throw new XrelException(unsetParameters);
     }
 
-    Form form = new Form();
-    form.param("grant_type", grantType);
-    form.param("client_id", getClientId().get());
-    form.param("client_secret", getClientSecret().get());
-    if (grantType == "authorization_code") {
-      form.param("code", code);
-    }
+    String refreshToken = null;
+    String redirectUri = null;
+    String scope = null;
     if (grantType == "refresh_token") {
-      form.param("refresh_token", token.getRefreshToken());
+      refreshToken = token.getRefreshToken();
     }
     if (grantType != "refresh_token" && getRedirectUri().isPresent()) {
-      form.param("redirect_uri", getRedirectUri().get());
+      redirectUri = getRedirectUri().get();
     }
     if (getScope().isPresent() && getScope().get().length > 0) {
-      String scope = String.join(" ", getScope().get());
-      form.param("scope", scope);
+      scope = String.join(" ", getScope().get());
     }
-    Entity<Form> entity = Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE);
 
-    final Client client = ClientBuilder.newClient();
-    client.register(RateLimitFilter.class);
-    client.register(CompressionHelper.class);
-    WebTarget webTarget = client.target(getXrelUrl());
-    webTarget = webTarget.path("oauth2/token");
-    // As per spec this always uses JSON and is not available via XML
-    Invocation.Builder invocationBuilder = webTarget.request(MediaType.APPLICATION_JSON);
-    Response response = invocationBuilder.post(entity);
-    Token newToken = handleResponse(new GenericType<Token>() {}, response);
+    Call<Token> call = RestClient.getInstance().getXrelService().oauth2Token(grantType,
+        getClientId().get(), getClientSecret().get(), code, redirectUri, refreshToken, scope);
+    Response<Token> response = null;
+    try {
+      response = call.execute();
+    } catch (Exception e) {
+      throw new XrelException(e);
+    }
+    response.body();
+    Token newToken = response.body();
 
     return newToken;
   }
@@ -2265,7 +2057,7 @@ public class Xrel {
    * @param grantType {@code authorization_code} for User authentication, {@code client_credentials}
    *        for Application authentication, {@code refresh_token} for refreshing an access token
    * @param code When performing the {@code authorization_code} grant, you must specify the code
-   *        provided from {@code #getOauth2Auth()}
+   *        provided from {@link #getOauth2Auth()}
    * @return The new {@link Token}
    * @throws XrelException If there is an error returned by the xREL API
    * @see <a href="https://www.xrel.to/wiki/6436/api-oauth2.html">API: OAuth 2.0</a>

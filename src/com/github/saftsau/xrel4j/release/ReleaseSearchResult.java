@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, 2018 saftsau
+ * Copyright 2017 - 2019 saftsau
  *
  * This file is part of xREL4J.
  *
@@ -17,32 +17,21 @@
 
 package com.github.saftsau.xrel4j.release;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.saftsau.xrel4j.release.p2p.P2pRelease;
 import com.github.saftsau.xrel4j.release.scene.Release;
 import java.util.List;
-import javax.json.bind.annotation.JsonbProperty;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
-import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Class represents an object containing two lists of {@link Release} and {@link P2pRelease}. This
  * is used for {@link Release} / {@link P2pRelease} search operations on the xREL API, which can
  * return both types.
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "releases_search")
 public class ReleaseSearchResult {
 
   private int total;
-  @XmlElement(name = "release", type = Release.class)
-  @XmlElementWrapper
   private List<Release> results;
-  @JsonbProperty("p2p_results")
-  @XmlElement(name = "p2p_rls", type = P2pRelease.class)
-  @XmlElementWrapper(name = "p2p_results")
+  @JsonProperty("p2p_results")
   private List<P2pRelease> p2pResults;
 
   /**

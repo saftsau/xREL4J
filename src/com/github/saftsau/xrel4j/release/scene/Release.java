@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, 2018 saftsau
+ * Copyright 2017 - 2019 saftsau
  *
  * This file is part of xREL4J.
  *
@@ -17,38 +17,26 @@
 
 package com.github.saftsau.xrel4j.release.scene;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.saftsau.xrel4j.release.ReleaseBase;
 import com.github.saftsau.xrel4j.release.Size;
 import java.util.Map;
-import javax.json.bind.annotation.JsonbProperty;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-
 /**
  * Class represents a release with all its information provided by the xREL API.
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement
 public class Release extends ReleaseBase {
 
   private long time;
-  @JsonbProperty("group_name")
-  @XmlElement(name = "group_name")
+  @JsonProperty("group_name")
   private String groupName;
-  @JsonbProperty("nuke_reason")
-  @XmlElement(name = "nuke_reason")
+  @JsonProperty("nuke_reason")
   private String nukeReason;
   private Size size;
-  @JsonbProperty("video_type")
-  @XmlElement(name = "video_type")
+  @JsonProperty("video_type")
   private String videoType;
-  @JsonbProperty("audio_type")
-  @XmlElement(name = "audio_type")
+  @JsonProperty("audio_type")
   private String audioType;
-  @JsonbProperty("proof_url")
-  @XmlElement(name = "proof_url")
+  @JsonProperty("proof_url")
   private String proofUrl;
   private Map<String, Boolean> flags;
 

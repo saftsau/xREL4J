@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, 2018 saftsau
+ * Copyright 2017 - 2019 saftsau
  *
  * This file is part of xREL4J.
  *
@@ -17,21 +17,20 @@
 
 package com.github.saftsau.xrel4j.extinfo;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import java.time.LocalDate;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  * Class represents a release date an {@link ExtInfo} can contain.
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement
 public class ReleaseDate {
 
   private String type;
-  @XmlJavaTypeAdapter(value = LocalDateAdapter.class)
+  @JsonDeserialize(using = LocalDateDeserializer.class)  
+  @JsonSerialize(using = LocalDateSerializer.class)  
   private LocalDate date;
 
   /**

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, 2018 saftsau
+ * Copyright 2017 - 2019 saftsau
  *
  * This file is part of xREL4J.
  *
@@ -17,28 +17,19 @@
 
 package com.github.saftsau.xrel4j;
 
-import javax.json.bind.annotation.JsonbProperty;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Class represents an Error. Used for all information the xREL API offers when returning errors.
  * 
  * @see <a href="https://www.xrel.to/wiki/6435/api-errors.html">API: Error Handling</a>
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement
 public class Error {
 
-  @XmlElement
   public String error;
-  @JsonbProperty("error_description")
-  @XmlElement(name = "error_description")
+  @JsonProperty("error_description")
   public String errorDescription;
-  @JsonbProperty("error_type")
-  @XmlElement(name = "error_type")
+  @JsonProperty("error_type")
   public String errorType;
 
   /**

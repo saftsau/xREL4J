@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, 2018 saftsau
+ * Copyright 2017 - 2019 saftsau
  *
  * This file is part of xREL4J.
  *
@@ -17,29 +17,21 @@
 
 package com.github.saftsau.xrel4j;
 
-import javax.json.bind.annotation.JsonbProperty;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Class represents a user as returned by the xREL API. This is implemented using a singleton
  * pattern.
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement
 public class User {
 
   private String id;
   private String name;
   private String secret;
   private String locale;
-  @JsonbProperty("avatar_url")
-  @XmlElement(name = "avatar_url")
+  @JsonProperty("avatar_url")
   private String avatarUrl;
-  @JsonbProperty("avatar_thumb_url")
-  @XmlElement(name = "avatar_thumb_url")
+  @JsonProperty("avatar_thumb_url")
   private String avatarThumbUrl;
 
   /**

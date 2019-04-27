@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, 2018 saftsau
+ * Copyright 2017 - 2019 saftsau
  *
  * This file is part of xREL4J.
  *
@@ -17,35 +17,19 @@
 
 package com.github.saftsau.xrel4j;
 
-import com.github.saftsau.xrel4j.comment.Comment;
-import com.github.saftsau.xrel4j.release.p2p.P2pRelease;
-import com.github.saftsau.xrel4j.release.scene.Release;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
-import javax.json.bind.annotation.JsonbProperty;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
-import javax.xml.bind.annotation.XmlElements;
-import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Class used for storing a paginated list of any content.
  * 
  * @param <T> The type of the content of this list
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement
 public class PaginationList<T> {
 
-  @JsonbProperty("total_count")
-  @XmlElement(name = "total_count")
+  @JsonProperty("total_count")
   private long totalCount;
   private Pagination pagination;
-  @XmlElements({@XmlElement(name = "comment", type = Comment.class),
-      @XmlElement(name = "p2p_rls", type = P2pRelease.class),
-      @XmlElement(name = "release", type = Release.class)})
-  @XmlElementWrapper(name = "list")
   private List<T> list;
 
   /**

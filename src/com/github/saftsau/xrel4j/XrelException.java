@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, 2018 saftsau
+ * Copyright 2017 - 2019 saftsau
  *
  * This file is part of xREL4J.
  *
@@ -25,7 +25,7 @@ import java.util.Optional;
  * 
  * @see <a href="https://www.xrel.to/wiki/6435/api-errors.html">API: Error Handling</a>
  */
-public class XrelException extends Exception {
+public class XrelException extends RuntimeException {
 
   private static final long serialVersionUID = -6556750388263888839L;
   private Optional<Error> error;

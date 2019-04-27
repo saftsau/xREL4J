@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, 2018 saftsau
+ * Copyright 2017 - 2019 saftsau
  *
  * This file is part of xREL4J.
  *
@@ -18,15 +18,10 @@
 package com.github.saftsau.xrel4j.release;
 
 import com.github.saftsau.xrel4j.release.scene.Release;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Class represents a size as used in {@link Release} objects.
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement
 public class Size {
 
   private int number;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, 2018 saftsau
+ * Copyright 2017 - 2019 saftsau
  *
  * This file is part of xREL4J.
  *
@@ -17,15 +17,9 @@
 
 package com.github.saftsau.xrel4j;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-
 /**
  * Class represents a filter, which can be used to customize the getLatestRelease() method.
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement
 public class Filter {
 
   private long id;

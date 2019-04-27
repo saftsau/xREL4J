@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, 2018 saftsau
+ * Copyright 2017 - 2019 saftsau
  *
  * This file is part of xREL4J.
  *
@@ -17,43 +17,31 @@
 
 package com.github.saftsau.xrel4j.favorite;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.saftsau.xrel4j.extinfo.ExtInfo;
 import com.github.saftsau.xrel4j.release.p2p.P2pRelease;
 import java.util.List;
-import javax.json.bind.annotation.JsonbProperty;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Class represents a Favorite list by the currently logged in user.
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "fav_list")
 public class Favorite {
 
   private long id;
   private String name;
-  @JsonbProperty("public")
-  @XmlElement(name = "public")
+  @JsonProperty("public")
   private boolean public_;
   private boolean notify;
-  @JsonbProperty("auto_read")
-  @XmlElement(name = "auto_read")
+  @JsonProperty("auto_read")
   private boolean autoRead;
-  @JsonbProperty("include_p2p")
-  @XmlElement(name = "include_p2p")
+  @JsonProperty("include_p2p")
   private boolean includeP2p;
   private String description;
-  @JsonbProperty("password_hash")
-  @XmlElement(name = "password_hash")
+  @JsonProperty("password_hash")
   private String passwordHash;
-  @JsonbProperty("entry_count")
-  @XmlElement(name = "entry_count")
+  @JsonProperty("entry_count")
   private long entryCount;
-  @JsonbProperty("unread_releases")
-  @XmlElement(name = "unread_releases")
+  @JsonProperty("unread_releases")
   private long unreadReleases;
   private List<ExtInfo> entries;
 

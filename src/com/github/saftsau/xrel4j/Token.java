@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, 2018 saftsau
+ * Copyright 2017 - 2019 saftsau
  *
  * This file is part of xREL4J.
  *
@@ -17,31 +17,21 @@
 
 package com.github.saftsau.xrel4j;
 
-import javax.json.bind.annotation.JsonbProperty;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Class represents a Token used by the xREL API to access protected methods or additional user
  * data.
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement
 public class Token {
 
-  @JsonbProperty("access_token")
-  @XmlElement(name = "access_token")
+  @JsonProperty("access_token")
   private String accessToken;
-  @JsonbProperty("token_type")
-  @XmlElement(name = "token_type")
+  @JsonProperty("token_type")
   private String tokenType;
-  @JsonbProperty("expires_in")
-  @XmlElement(name = "expires_in")
+  @JsonProperty("expires_in")
   private int expiresIn;
-  @JsonbProperty("refresh_token")
-  @XmlElement(name = "refresh_token")
+  @JsonProperty("refresh_token")
   private String refreshToken;
   private long creationTime;
 
@@ -70,6 +60,15 @@ public class Token {
     this.expiresIn = expiresIn;
     this.refreshToken = refreshToken;
     this.creationTime = System.currentTimeMillis() / 1000L;
+  }
+
+  /**
+   * Creates a String representation to be used in Authorization headers.
+   * 
+   * @return The String to be used in Authroization headers
+   */
+  public String createBearerHeader() {
+    return "Bearer " + getAccessToken();
   }
 
   /**

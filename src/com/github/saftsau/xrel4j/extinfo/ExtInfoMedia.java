@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, 2018 saftsau
+ * Copyright 2017 - 2019 saftsau
  *
  * This file is part of xREL4J.
  *
@@ -17,34 +17,24 @@
 
 package com.github.saftsau.xrel4j.extinfo;
 
-import javax.json.bind.annotation.JsonbProperty;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Class represents media an {@link ExtInfo} can contain. Used for adding images (hosted on xREL)
  * and videos (hosted on YouTube).
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "item")
 public class ExtInfoMedia {
 
   private String type;
   private String description;
   private long time;
-  @JsonbProperty("url_full")
-  @XmlElement(name = "url_full")
+  @JsonProperty("url_full")
   private String urlFull;
-  @JsonbProperty("url_thumb")
-  @XmlElement(name = "url_thumb")
+  @JsonProperty("url_thumb")
   private String urlThumb;
-  @JsonbProperty("youtube_id")
-  @XmlElement(name = "youtube_id")
+  @JsonProperty("youtube_id")
   private String youtubeId;
-  @JsonbProperty("video_url")
-  @XmlElement(name = "video_url")
+  @JsonProperty("video_url")
   private String videoUrl;
 
   /**

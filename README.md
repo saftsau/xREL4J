@@ -12,24 +12,9 @@ https://www.xrel.to/wiki/1681/API.html
 Requirements
 ------------
 
-In order to use xREL4J you need a couple of prerequisites:
+In order to use xREL4J you need at least Java 8.
 
-- Minimum required Java version is Java 8.
-
-- A JAX-RS (JSR-339) implementation, e.g. [Jersey](https://jersey.github.io). Any other JAX-RS implementation should theoretically work, although only Jersey has been tested.
-
-- If you want to use JSON you have to add:
-
-    - A JSON-P (JSR-374) implementation, e.g. [Eclipse JSON-P](https://projects.eclipse.org/projects/ee4j.jsonp). Any other JSON-P implementation should theoretically work, although only Eclipse JSON-P has been tested.
-
-    - A JSON-B (JSR-367) implementation, e.g. [Eclipse Yasson](https://projects.eclipse.org/projects/ee4j.yasson). Any other JSON-B implementation should theoretically work, although only Eclipse Yasson has been tested.
-
-- If you want to use XML you have to add:
-
-    - A JAXB (JSR-222) implementation, e.g. [JAXB RI](https://javaee.github.io/jaxb-v2/). Any other JAXB implementation should theoretically work, although only JAXB RI has been tested.
-
-Keep in mind that the oauth2/token endpoint always returns JSON. If you intend to use that, you have to add JSON-P and JSON-B, but you can still use JAXB for all other requests. If you don't plan on using this method, you can solely rely on JAXB.
-There are also some internal Java methods used for making XML work without breaking JSON compatibility or having to maintain two completely different implementations. This means, that there might be breakage in later Java versions.
+Android is supported, but for older versions you probably need a support library to make the Java Time API working. Starting from API level 26 you are good to go without any support libraries.
 
 Setup
 -----
@@ -38,7 +23,9 @@ Setup
 
     git clone https://github.com/saftsau/xREL4J.git
 
-- Get your favored JAX-RS + JSON-B + JSON-P implementation.
+- Alternatively download an already built release from Maven Central Repository:
+
+    https://mvnrepository.com/artifact/com.github.saftsau/xREL4J
 
 - Add xREL4J and your chosen implementation libraries to your project.
 

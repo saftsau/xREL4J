@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, 2018 saftsau
+ * Copyright 2017 - 2019 saftsau
  *
  * This file is part of xREL4J.
  *
@@ -17,15 +17,9 @@
 
 package com.github.saftsau.xrel4j.comment;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-
 /**
  * Class used to represent votes used on {@link Comment}.
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement
 public class Votes {
 
   private int positive;

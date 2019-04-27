@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 saftsau
+ * Copyright 2018, 2019 saftsau
  *
  * This file is part of xREL4J.
  *
@@ -17,21 +17,18 @@
 
 package com.github.saftsau.xrel4j;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
-import java.util.List;
-import javax.annotation.Priority;
-import javax.ws.rs.Priorities;
-import javax.ws.rs.client.ClientRequestContext;
-import javax.ws.rs.client.ClientResponseContext;
-import javax.ws.rs.client.ClientResponseFilter;
-import javax.ws.rs.ext.Provider;
+import java.nio.charset.StandardCharsets;
+import okhttp3.Interceptor;
+import okhttp3.Response;
+import okio.Buffer;
+import okio.BufferedSource;
 
 /**
  * {@link ClientResponseFilter} class used to handle rate limit headers.
  */
-@Priority(Priorities.HEADER_DECORATOR)
-@Provider
-class RateLimitFilter implements ClientResponseFilter {
+class ResponseInterceptor implements Interceptor {
 
   private static int xRateLimitLimit = -1;
   private static int xRateLimitRemaining = -1;
@@ -39,33 +36,48 @@ class RateLimitFilter implements ClientResponseFilter {
   private static int responseCode = -1;
 
   @Override
-  public void filter(ClientRequestContext requestContext, ClientResponseContext responseContext)
-      throws IOException {
-    if (responseContext != null) {
-      setResponseCode(responseContext.getStatus());
-      if (responseContext.getHeaders() != null && responseContext.getHeaders().size() > 0) {
-        // X-RateLimit-Limit
-        final List<String> xRateLimitLimitList =
-            responseContext.getHeaders().get("X-RateLimit-Limit");
-        if (xRateLimitLimitList != null && xRateLimitLimitList.size() == 1) {
-          setXRateLimitLimit(Integer.valueOf(xRateLimitLimitList.get(0)));
-        }
+  public Response intercept(Chain chain) throws IOException {
+    Response response = chain.proceed(chain.request());
 
-        // X-RateLimit-Remaining
-        final List<String> xRateLimitRemainingList =
-            responseContext.getHeaders().get("X-RateLimit-Remaining");
-        if (xRateLimitRemainingList != null && xRateLimitRemainingList.size() == 1) {
-          setXRateLimitRemaining(Integer.valueOf(xRateLimitRemainingList.get(0)));
-        }
+    setResponseCode(response.code());
 
-        // X-RateLimit-Reset
-        final List<String> xRateLimitLimitReset =
-            responseContext.getHeaders().get("X-RateLimit-Reset");
-        if (xRateLimitLimitReset != null && xRateLimitLimitReset.size() == 1) {
-          setXRateLimitReset(Integer.valueOf(xRateLimitLimitReset.get(0)));
-        }
-      }
+    final String xRateLimitLimit = response.headers().get("X-RateLimit-Limit");
+    if (xRateLimitLimit != null) {
+      setXRateLimitLimit(Integer.valueOf(xRateLimitLimit));
     }
+
+    final String xRateLimitRemaining = response.headers().get("X-RateLimit-Remaining");
+    if (xRateLimitRemaining != null) {
+      setXRateLimitRemaining(Integer.valueOf(xRateLimitRemaining));
+    }
+
+    final String xRateLimitReset = response.headers().get("X-RateLimit-Reset");
+    if (xRateLimitReset != null) {
+      setXRateLimitReset(Integer.valueOf(xRateLimitReset));
+    }
+
+    // Try to handle an error. We have to rely on this method because currently the status codes
+    // returned by the xREL API can't be trusted, e.g. returning 2xx responses for errors.
+    // Otherwise we have an error
+    BufferedSource source = response.body().source();
+    source.request(Long.MAX_VALUE); // request the entire body.
+    Buffer buffer = source.buffer();
+    // clone buffer before reading from it
+    String responseString = buffer.clone().readString(StandardCharsets.UTF_8);
+    ObjectMapper objectMapper = new ObjectMapper();
+    Error error = null;
+    try {
+      error = objectMapper.readValue(responseString, Error.class);
+    } catch (Exception e) {
+      // Nothing, either there was no error or it was not an xREL API error
+    }
+    if (error != null) {
+      throw new XrelException(error.getErrorDescription(), error, getResponseCode());
+    } else if (!response.isSuccessful()) {
+      throw new XrelException(getResponseCode());
+    }
+
+    return response;
   }
 
   /**
@@ -87,7 +99,7 @@ class RateLimitFilter implements ClientResponseFilter {
    * @see <a href="https://www.xrel.to/wiki/2727/api-rate-limiting.html">API: Rate Limiting</a>
    */
   private static void setXRateLimitLimit(int xRateLimitLimit) {
-    RateLimitFilter.xRateLimitLimit = xRateLimitLimit;
+    ResponseInterceptor.xRateLimitLimit = xRateLimitLimit;
   }
 
   /**
@@ -109,7 +121,7 @@ class RateLimitFilter implements ClientResponseFilter {
    * @see <a href="https://www.xrel.to/wiki/2727/api-rate-limiting.html">API: Rate Limiting</a>
    */
   private static void setXRateLimitRemaining(int xRateLimitRemaining) {
-    RateLimitFilter.xRateLimitRemaining = xRateLimitRemaining;
+    ResponseInterceptor.xRateLimitRemaining = xRateLimitRemaining;
   }
 
   /**
@@ -131,7 +143,7 @@ class RateLimitFilter implements ClientResponseFilter {
    * @see <a href="https://www.xrel.to/wiki/2727/api-rate-limiting.html">API: Rate Limiting</a>
    */
   private static void setXRateLimitReset(int xRateLimitReset) {
-    RateLimitFilter.xRateLimitReset = xRateLimitReset;
+    ResponseInterceptor.xRateLimitReset = xRateLimitReset;
   }
 
   /**
@@ -149,7 +161,7 @@ class RateLimitFilter implements ClientResponseFilter {
    * @param responseCode The response code to set
    */
   private static void setResponseCode(int responseCode) {
-    RateLimitFilter.responseCode = responseCode;
+    ResponseInterceptor.responseCode = responseCode;
   }
 
 }

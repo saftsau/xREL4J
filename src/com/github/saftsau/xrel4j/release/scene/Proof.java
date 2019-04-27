@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, 2018 saftsau
+ * Copyright 2017 - 2019 saftsau
  *
  * This file is part of xREL4J.
  *
@@ -17,25 +17,17 @@
 
 package com.github.saftsau.xrel4j.release.scene;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
-import javax.json.bind.annotation.JsonbProperty;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Class represents a proof. This is retrieved partially by the xREL API after the user posted one.
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement
 public class Proof {
 
-  @JsonbProperty("proof_url")
-  @XmlElement(name = "proof_url")
+  @JsonProperty("proof_url")
   private String proofUrl;
-  @JsonbProperty("release_list")
-  @XmlElement(name = "release_list")
+  @JsonProperty("release_list")
   private List<Release> releaseList;
 
   /**
